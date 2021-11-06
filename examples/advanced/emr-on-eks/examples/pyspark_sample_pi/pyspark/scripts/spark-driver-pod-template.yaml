@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Pod
+spec:
+  nodeSelector:
+    eks.amazonaws.com/capacityType: ON_DEMAND
+    topology.kubernetes.io/zone: eu-west-1a
+#    node.kubernetes.io/instance-type: m5.xlarge
