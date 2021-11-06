@@ -119,9 +119,9 @@ module "aws-eks-accelerator-for-terraform" {
     }
   }
 
-  metrics_server_enable = true
+  metrics_server_enable     = true
   cluster_autoscaler_enable = true
-//  prometheus_enable = true
+  //  prometheus_enable = true
   #---------------------------------------
   # ENABLE EMR ON EKS
   #---------------------------------------
@@ -137,7 +137,7 @@ module "aws-eks-accelerator-for-terraform" {
       emr_on_eks_namespace     = "emr-data-team-b"
       emr_on_eks_iam_role_name = "emr-eks-data-team-b"
     }
-    
+
   }
 
 }

@@ -119,7 +119,7 @@ module "aws-eks-accelerator-for-terraform" {
     }
   }
 
-  metrics_server_enable = true
+  metrics_server_enable     = true
   cluster_autoscaler_enable = true
   #---------------------------------------
   # COMMUNITY PROMETHEUS ENABLE

@@ -78,7 +78,7 @@ module "aws-eks-accelerator-for-terraform" {
   # EKS WORKER NODE GROUPS
   #---------------------------------------------------------#
   enable_managed_nodegroups = var.enable_self_managed_nodegroups
-  managed_node_groups = var.managed_node_groups
+  managed_node_groups       = var.managed_node_groups
 
   #---------------------------------------------------------#
   # EKS SELF MANAGED WORKER NODE GROUPS
@@ -89,29 +89,29 @@ module "aws-eks-accelerator-for-terraform" {
   windows_vpc_admission_webhook_image_tag   = "v0.2.7" # enable_windows_support= true
 
   enable_self_managed_nodegroups = var.enable_self_managed_nodegroups
-  self_managed_node_groups = var.self_managed_node_groups
+  self_managed_node_groups       = var.self_managed_node_groups
 
   #---------------------------------------------------------#
   # FARGATE PROFILES
   #---------------------------------------------------------#
-  enable_fargate = var.enable_fargate
+  enable_fargate   = var.enable_fargate
   fargate_profiles = var.fargate_profiles
 
   #---------------------------------------
   # METRICS SERVER HELM ADDON
   #---------------------------------------
-  metrics_server_enable = var.metrics_server_enable
+  metrics_server_enable     = var.metrics_server_enable
   metrics_server_helm_chart = var.metrics_server_helm_chart
 
   #---------------------------------------
   # CLUSTER AUTOSCALER HELM ADDON
   #---------------------------------------
-  cluster_autoscaler_enable = var.cluster_autoscaler_helm_chart
+  cluster_autoscaler_enable     = var.cluster_autoscaler_helm_chart
   cluster_autoscaler_helm_chart = var.cluster_autoscaler_helm_chart
 
   #---------------------------------------
   # TRAEFIK INGRESS CONTROLLER HELM ADDON
   #---------------------------------------
   traefik_ingress_controller_enable = var.traefik_ingress_controller_enable
-  traefik_helm_chart =var.traefik_helm_chart
+  traefik_helm_chart                = var.traefik_helm_chart
 }

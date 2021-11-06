@@ -93,7 +93,7 @@ module "aws_vpc" {
 # Example to consume aws-eks-accelerator-for-terraform module
 #---------------------------------------------------------------
 module "aws-eks-accelerator-for-terraform" {
-  source = "git@github.com:aws-samples/aws-eks-accelerator-for-terraform.git"
+  source            = "git@github.com:aws-samples/aws-eks-accelerator-for-terraform.git"
   tenant            = local.tenant
   environment       = local.environment
   zone              = local.zone
@@ -114,8 +114,8 @@ module "aws-eks-accelerator-for-terraform" {
     mg_4 = {
       node_group_name = "managed-ondemand"
       instance_types = [
-        "m5.xlarge"]
-      max_size = "12"
+      "m5.xlarge"]
+      max_size   = "12"
       subnet_ids = module.aws_vpc.private_subnets
     }
   }
