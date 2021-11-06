@@ -15,37 +15,6 @@
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-
-terraform {
-  required_version = ">= 1.0.1"
-
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 3.60.0"
-    }
-    kubernetes = {
-      source  = "hashicorp/kubernetes"
-      version = "~> 2.5.0"
-    }
-    helm = {
-      source  = "hashicorp/helm"
-      version = "~> 2.3.0"
-    }
-  }
-}
-
-provider "aws" {
-  region = data.aws_region.current.id
-  alias  = "default"
-}
-
-terraform {
-  backend "local" {
-    path = "local_tf_state/terraform-main.tfstate"
-  }
-}
-
 data "aws_region" "current" {}
 
 data "aws_availability_zones" "available" {}
@@ -53,11 +22,11 @@ data "aws_availability_zones" "available" {}
 locals {
   tenant      = "aws001"  # AWS account name or unique id for tenant
   environment = "preprod" # Environment area eg., preprod or prod
-  zone        = "dev"     # Environment with in one sub_tenant or business unit
+  zone        = "qa"      # Environment with in one sub_tenant or business unit
 
   kubernetes_version = "1.21"
 
-  vpc_cidr     = "10.0.0.0/16"
+  vpc_cidr     = "10.2.0.0/16"
   vpc_name     = join("-", [local.tenant, local.environment, local.zone, "vpc"])
   cluster_name = join("-", [local.tenant, local.environment, local.zone, "eks"])
 
@@ -78,6 +47,7 @@ module "aws_vpc" {
   enable_nat_gateway   = true
   create_igw           = true
   enable_dns_hostnames = true
+  single_nat_gateway   = true
 
   public_subnet_tags = {
     "kubernetes.io/cluster/${local.cluster_name}" = "shared"
@@ -94,7 +64,7 @@ module "aws_vpc" {
 # Example to consume aws-eks-accelerator-for-terraform module
 #---------------------------------------------------------------
 module "aws-eks-accelerator-for-terraform" {
-  source = "git@github.com:aws-samples/aws-eks-accelerator-for-terraform.git"
+  source = "github.com/aws-samples/aws-eks-accelerator-for-terraform.git?ref=gitlab-ci-cd"
 
   tenant            = local.tenant
   environment       = local.environment
@@ -114,47 +84,14 @@ module "aws-eks-accelerator-for-terraform" {
   managed_node_groups = {
     mg_4 = {
       node_group_name = "managed-ondemand"
-      instance_types  = ["m5.xlarge"]
+      instance_types  = ["m4.large"]
       subnet_ids      = module.aws_vpc.private_subnets
+      max_size        = "10"
     }
   }
 
-  metrics_server_enable     = true
+  metrics_server_enable = true
+
   cluster_autoscaler_enable = true
-  #---------------------------------------
-  # COMMUNITY PROMETHEUS ENABLE
-  #---------------------------------------
-  prometheus_enable = true
-
-  # Optional Map value
-  prometheus_helm_chart = {
-    name       = "prometheus"                                         # (Required) Release name.
-    repository = "https://prometheus-community.github.io/helm-charts" # (Optional) Repository URL where to locate the requested chart.
-    chart      = "prometheus"                                         # (Required) Chart name to be installed.
-    version    = "14.4.0"                                             # (Optional) Specify the exact chart version to install. If this is not specified, the latest version is installed.
-    namespace  = "prometheus"                                         # (Optional) The namespace to install the release into. Defaults to default
-    values = [templatefile("${path.module}/k8s_addons/prometheus-values.yaml", {
-      operating_system = "linux"
-    })]
-
-  }
-
-  #---------------------------------------
-  # ENABLE SPARK on K8S OPERATOR
-  #---------------------------------------
-  spark_on_k8s_operator_enable = true
-
-  # Optional Map value
-  spark_on_k8s_operator_helm_chart = {
-    name             = "spark-operator"
-    chart            = "spark-operator"
-    repository       = "https://googlecloudplatform.github.io/spark-on-k8s-operator"
-    version          = "1.1.6"
-    namespace        = "spark-k8s-operator"
-    timeout          = "1200"
-    create_namespace = true
-    values           = [templatefile("${path.module}/k8s_addons/spark-k8s-operator-values.yaml", {})]
-
-  }
 
 }

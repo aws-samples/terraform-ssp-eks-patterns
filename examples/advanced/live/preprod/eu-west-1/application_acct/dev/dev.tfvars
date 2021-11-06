@@ -5,7 +5,7 @@ zone              = "dev"     # Environment with in one sub_tenant or business u
 terraform_version = "Terraform v1.0.1"
 
 
-create_eks = true
+create_eks         = true
 kubernetes_version = "1.21"
 
 enable_managed_nodegroups = true
@@ -315,39 +315,39 @@ fargate_profiles = {
 
 metrics_server_enable = true
 metrics_server_helm_chart = {
-name       = "metrics-server"                                    # (Required) Release name.
-repository = "https://kubernetes-sigs.github.io/metrics-server/" # (Optional) Repository URL where to locate the requested chart.
-chart      = "metrics-server"                                    # (Required) Chart name to be installed.
-version    = "3.5.0"                                             # (Optional) Specify the exact chart version to install. If this is not specified, the latest version is installed.
-namespace  = "kube-system"                                       # (Optional) The namespace to install the release into. Defaults to default
-timeout    = "1200"                                              # (Optional)
-lint       = "true"                                              # (Optional)
+  name       = "metrics-server"                                    # (Required) Release name.
+  repository = "https://kubernetes-sigs.github.io/metrics-server/" # (Optional) Repository URL where to locate the requested chart.
+  chart      = "metrics-server"                                    # (Required) Chart name to be installed.
+  version    = "3.5.0"                                             # (Optional) Specify the exact chart version to install. If this is not specified, the latest version is installed.
+  namespace  = "kube-system"                                       # (Optional) The namespace to install the release into. Defaults to default
+  timeout    = "1200"                                              # (Optional)
+  lint       = "true"                                              # (Optional)
 
-# (Optional) Example to show how to pass metrics-server-values.yaml
-values = [templatefile("${path.module}/k8s_addons/metrics-server-values.yaml", {
-operating_system = "linux"
-})]
+  # (Optional) Example to show how to pass metrics-server-values.yaml
+  values = [templatefile("${path.module}/k8s_addons/metrics-server-values.yaml", {
+    operating_system = "linux"
+  })]
 }
 
 cluster_autoscaler_enable = true
 
 cluster_autoscaler_helm_chart = {
-name       = "cluster-autoscaler"                      # (Required) Release name.
-repository = "https://kubernetes.github.io/autoscaler" # (Optional) Repository URL where to locate the requested chart.
-chart      = "cluster-autoscaler"                      # (Required) Chart name to be installed.
-version    = "9.10.7"                                  # (Optional) Specify the exact chart version to install. If this is not specified, the latest version is installed.
-namespace  = "kube-system"                             # (Optional) The namespace to install the release into. Defaults to default
-timeout    = "1200"                                    # (Optional)
-lint       = "true"                                    # (Optional)
+  name       = "cluster-autoscaler"                      # (Required) Release name.
+  repository = "https://kubernetes.github.io/autoscaler" # (Optional) Repository URL where to locate the requested chart.
+  chart      = "cluster-autoscaler"                      # (Required) Chart name to be installed.
+  version    = "9.10.7"                                  # (Optional) Specify the exact chart version to install. If this is not specified, the latest version is installed.
+  namespace  = "kube-system"                             # (Optional) The namespace to install the release into. Defaults to default
+  timeout    = "1200"                                    # (Optional)
+  lint       = "true"                                    # (Optional)
 
-# (Optional) Example to show how to pass metrics-server-values.yaml
-values = [templatefile("${path.module}/k8s_addons/cluster-autoscaler-vaues.yaml", {
-operating_system = "linux"
-})]
+  # (Optional) Example to show how to pass metrics-server-values.yaml
+  values = [templatefile("${path.module}/k8s_addons/cluster-autoscaler-vaues.yaml", {
+    operating_system = "linux"
+  })]
 }
 
 traefik_ingress_controller_enable = false
-traefik_helm_chart =  {
+traefik_helm_chart = {
   name       = "traefik"                         # (Required) Release name.
   repository = "https://helm.traefik.io/traefik" # (Optional) Repository URL where to locate the requested chart.
   chart      = "traefik"                         # (Required) Chart name to be installed.
