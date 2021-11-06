@@ -64,23 +64,44 @@ locals {
   terraform_version = "Terraform v1.0.1"
 }
 
+module "aws_vpc" {
+  source  = "terraform-aws-modules/vpc/aws"
+  version = "v3.2.0"
+
+  name = local.vpc_name
+  cidr = local.vpc_cidr
+  azs  = data.aws_availability_zones.available.names
+
+  public_subnets  = [for k, v in slice(data.aws_availability_zones.available.names, 0, 3) : cidrsubnet(local.vpc_cidr, 8, k)]
+  private_subnets = [for k, v in slice(data.aws_availability_zones.available.names, 0, 3) : cidrsubnet(local.vpc_cidr, 8, k + 10)]
+
+  enable_nat_gateway   = true
+  create_igw           = true
+  enable_dns_hostnames = true
+
+  public_subnet_tags = {
+    "kubernetes.io/cluster/${local.cluster_name}" = "shared"
+    "kubernetes.io/role/elb"                      = "1"
+  }
+
+  private_subnet_tags = {
+    "kubernetes.io/cluster/${local.cluster_name}" = "shared"
+    "kubernetes.io/role/internal-elb"             = "1"
+  }
+}
 #---------------------------------------------------------------
 # Example to consume aws-eks-accelerator-for-terraform module
 #---------------------------------------------------------------
 module "aws-eks-accelerator-for-terraform" {
-//  source = "git@github.com:aws-samples/aws-eks-accelerator-for-terraform.git"
-  source = "/Users/vabonthu/Documents/GITHUB/aws-eks-accelerator-for-terraform"
+  source = "git@github.com:aws-samples/aws-eks-accelerator-for-terraform.git"
   tenant            = local.tenant
   environment       = local.environment
   zone              = local.zone
   terraform_version = local.terraform_version
 
   # EKS Cluster VPC and Subnet mandatory config
-  vpc_id = "vpc-0a172d7ab14ae0dbd"
-  private_subnet_ids = [
-    "subnet-0145a0dba9edb8d67",
-    "subnet-044af15285bba8e1f",
-  "subnet-03ee35df9c9a5a742"]
+  vpc_id             = module.aws_vpc.vpc_id
+  private_subnet_ids = module.aws_vpc.private_subnets
 
   # EKS CONTROL PLANE VARIABLES
   create_eks         = true
@@ -93,12 +114,9 @@ module "aws-eks-accelerator-for-terraform" {
     mg_4 = {
       node_group_name = "managed-ondemand"
       instance_types = [
-      "m5.xlarge"]
+        "m5.xlarge"]
       max_size = "12"
-      subnet_ids = [
-        "subnet-0145a0dba9edb8d67",
-        "subnet-044af15285bba8e1f",
-      "subnet-03ee35df9c9a5a742"]
+      subnet_ids = module.aws_vpc.private_subnets
     }
   }
   #---------------------------------------
