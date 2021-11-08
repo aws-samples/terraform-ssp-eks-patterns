@@ -53,7 +53,7 @@ data "aws_availability_zones" "available" {}
 locals {
   tenant      = "aws001"  # AWS account name or unique id for tenant
   environment = "preprod" # Environment area eg., preprod or prod
-  zone        = "dev"     # Environment with in one sub_tenant or business unit
+  zone        = "test"    # Environment with in one sub_tenant or business unit
 
   kubernetes_version = "1.21"
 
@@ -121,7 +121,18 @@ module "aws-eks-accelerator-for-terraform" {
 
   metrics_server_enable     = true
   cluster_autoscaler_enable = true
-  //  prometheus_enable = true
+
+  #---------------------------------------
+  # AWS MANAGED PROMETHEUS ENABLE
+  #---------------------------------------
+  aws_managed_prometheus_enable         = true
+  aws_managed_prometheus_workspace_name = "amp-workspace-${local.cluster_name}"
+
+  #---------------------------------------
+  # COMMUNITY PROMETHEUS ENABLE
+  #---------------------------------------
+  prometheus_enable = true
+
   #---------------------------------------
   # ENABLE EMR ON EKS
   #---------------------------------------
