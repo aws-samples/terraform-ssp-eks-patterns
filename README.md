@@ -1,7 +1,6 @@
 # Terraform SSP EKS Patterns
 
-Welcome to the patterns repository for the [Amazon EKS SSP for Terraform](https://github.com/aws-ia/terraform-ssp-amazon-eks) framework. 
-This repository contains a number of examples for how you can leverage the framework to deploy multi-tenant environments on EKS with a variety of configurations. 
+Welcome to the patterns repository for the Amazon [EKS Accelerator for Terraform](https://github.com/aws-samples/aws-eks-accelerator-for-terraform) framework. This repository contains a number of examples for how you can leverage the framework to deploy multi-tenant environments on EKS with a variety of configurations. 
 
 ## Patterns 
 
@@ -9,7 +8,7 @@ The individual patterns can be found in the `examples` directory.
 
 ## Documentation
 
-Please refer to the Amazon EKS SSP for Terraform [documentation site](https://aws-quickstart.github.io/quickstart-ssp-amazon-eks) for complete project documentation.
+Please refer to the EKS Accelerator for Terraform [documentation directory](https://github.com/aws-samples/aws-eks-accelerator-for-terraform/blob/main/docs/index.md) for complete project documentation.
 
 ## Prerequisites:
 
@@ -24,7 +23,7 @@ Ensure that you have installed the following tools on your machine.
 Clone the repository 
 
 ```
-git@github.com:aws-samples/terraform-ssp-eks-patterns.git
+git clone git@github.com:aws-samples/terraform-ssp-eks-patterns.git
 ```
 
 Navigate into one of the example directories and run `terraform init`
