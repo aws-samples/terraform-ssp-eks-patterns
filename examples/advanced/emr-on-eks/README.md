@@ -72,10 +72,10 @@ cd examples/advanced/emr-on-eks/
 
 ## Step3: Execute Spark job on EMR Virtual Cluster
 
-Open and edit the `execute_spark_job.sh` file
+Open and edit the `5-spark-job-with-AMP-AMG.sh` file
 
 ```shell script
-vi examples/advanced/emr-on-eks/execute_spark_job.sh
+vi examples/advanced/emr-on-eks/examples/pyspark_sample_pi/5-spark-job-with-AMP-AMG.sh
 ```
 
 Update the following variables. Extract the emr_on_eks_role_id as **EMR_ROLE_ID** and cluster_name as **EKS_CLUSTER_ID** from Terraform Outputs (**Step1**)
