@@ -373,4 +373,20 @@ module "aws-eks-accelerator-for-terraform" {
     values           = [templatefile("${path.module}/k8s_addons/argocd-values.yaml", {})]
   }
 
+  #---------------------------------------
+  # KEDA ENABLE
+  #---------------------------------------
+  keda_enable = true
+
+  # Optional Map value
+  keda_helm_chart = {
+    name       = "keda"                                         # (Required) Release name.
+    repository = "https://kedacore.github.io/charts" # (Optional) Repository URL where to locate the requested chart.
+    chart      = "keda"                                         # (Required) Chart name to be installed.
+    version    = "2.4.0"                                             # (Optional) Specify the exact chart version to install. If this is not specified, the latest version is installed.
+    namespace  = "keda"                                         # (Optional) The namespace to install the release into. Defaults to default
+    values = [templatefile("${path.module}/k8s_addons/keda-values.yaml", {})]
+  }
+
+
 }
