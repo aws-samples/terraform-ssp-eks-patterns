@@ -1,6 +1,6 @@
 #!/bin/bash
 
-EMR_VIRTUAL_CLUSTER_ID=$1 # Expects Input parameter to delete EMR Virtual cluster id
+EMR_VIRTUAL_CLUSTER_ID=$1 # Expects Input parameter to delete EMR Virtual cluster id
 
 export VIRTUAL_CLUSTER_ID=$(aws emr-containers list-virtual-clusters --query "virtualClusters[?name=='${EMR_VIRTUAL_CLUSTER_ID}' && state=='RUNNING'].id" --output text)
 
