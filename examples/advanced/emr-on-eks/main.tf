@@ -115,7 +115,7 @@ module "aws-eks-accelerator-for-terraform" {
   managed_node_groups = {
     mg_4 = {
       node_group_name = "managed-ondemand"
-      instance_types  = ["m5.xlarge"]
+      instance_types  = ["m5.large"]
       subnet_ids      = module.aws_vpc.private_subnets
     }
   }
