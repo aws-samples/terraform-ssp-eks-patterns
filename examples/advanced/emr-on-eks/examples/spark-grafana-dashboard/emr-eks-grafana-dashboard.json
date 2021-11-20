@@ -22,7 +22,7 @@
   "panels": [
     {
       "collapsed": false,
-      "datasource": "AMP",
+      "datasource": null,
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -142,7 +142,7 @@
     },
     {
       "collapsed": true,
-      "datasource": "AMP",
+      "datasource": null,
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -321,7 +321,7 @@
     },
     {
       "collapsed": false,
-      "datasource": "AMP",
+      "datasource": null,
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -334,7 +334,7 @@
       "type": "row"
     },
     {
-      "datasource": "AMP",
+      "datasource": null,
       "editable": true,
       "error": false,
       "gridPos": {
@@ -675,7 +675,7 @@
     },
     {
       "collapsed": false,
-      "datasource": "AMP",
+      "datasource": null,
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -914,7 +914,7 @@
     },
     {
       "collapsed": false,
-      "datasource": "AMP",
+      "datasource": null,
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -1148,7 +1148,7 @@
     },
     {
       "collapsed": false,
-      "datasource": "AMP",
+      "datasource": null,
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -1470,7 +1470,7 @@
     },
     {
       "collapsed": false,
-      "datasource": "AMP",
+      "datasource": null,
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -1685,7 +1685,7 @@
     },
     {
       "collapsed": false,
-      "datasource": "AMP",
+      "datasource": null,
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -2466,7 +2466,7 @@
     },
     {
       "collapsed": false,
-      "datasource": "AMP",
+      "datasource": null,
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -2989,7 +2989,7 @@
     },
     {
       "collapsed": true,
-      "datasource": "AMP",
+      "datasource": null,
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -3215,7 +3215,7 @@
     },
     {
       "collapsed": true,
-      "datasource": "AMP",
+      "datasource": null,
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -3439,7 +3439,7 @@
     },
     {
       "collapsed": true,
-      "datasource": "AMP",
+      "datasource": null,
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -3647,7 +3647,7 @@
     },
     {
       "collapsed": true,
-      "datasource": "AMP",
+      "datasource": null,
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -5619,7 +5619,7 @@
     ]
   },
   "timezone": "browser",
-  "title": "Chicago Dashboard - Performance Metrics 3",
+  "title": "EMR on EKS - Spark Workload Dashboard",
   "uid": "E1-VXaK7z",
   "version": 140
 }
