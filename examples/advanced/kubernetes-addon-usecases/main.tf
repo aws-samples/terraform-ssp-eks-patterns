@@ -389,5 +389,18 @@ module "aws-eks-accelerator-for-terraform" {
     values = [templatefile("${path.module}/k8s_addons/keda-values.yaml", {})]
   }
 
+  #---------------------------------------
+  # Vertical Pod Autoscaling
+  #---------------------------------------
+  vpa_enable = true
+
+  vpa_helm_chart = {
+    name       = "vpa"                                 # (Required) Release name.
+    repository = "https://charts.fairwinds.com/stable" # (Optional) Repository URL where to locate the requested chart.
+    chart      = "vpa"                                 # (Required) Chart name to be installed.
+    version    = "0.5.0"                               # (Optional) Specify the exact chart version to install. If this is not specified, the latest version is installed.
+    namespace  = "vpa-ns"                              # (Optional) The namespace to install the release into. Defaults to default
+    values     = [templatefile("${path.module}/k8s_addons/vpa-values.yaml", {})]
+  }
 
 }

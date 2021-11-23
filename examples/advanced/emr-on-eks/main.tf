@@ -95,7 +95,8 @@ module "aws_vpc" {
 # Example to consume aws-eks-accelerator-for-terraform module
 #---------------------------------------------------------------
 module "aws-eks-accelerator-for-terraform" {
-  source = "github.com/aws-samples/aws-eks-accelerator-for-terraform"
+  source = "aws-samples/aws-eks-accelerator-for-terraform"
+  create_eks         = true
 
   tenant            = local.tenant
   environment       = local.environment
@@ -107,7 +108,7 @@ module "aws-eks-accelerator-for-terraform" {
   private_subnet_ids = module.aws_vpc.private_subnets
 
   # EKS CONTROL PLANE VARIABLES
-  create_eks         = true
+
   kubernetes_version = local.kubernetes_version
 
   # EKS MANAGED NODE GROUPS
@@ -115,7 +116,7 @@ module "aws-eks-accelerator-for-terraform" {
   managed_node_groups = {
     mg_4 = {
       node_group_name = "managed-ondemand"
-      instance_types  = ["m5.large"]
+      instance_types  = ["m5.xlarge"]
       subnet_ids      = module.aws_vpc.private_subnets
     }
   }
@@ -135,7 +136,17 @@ module "aws-eks-accelerator-for-terraform" {
   prometheus_enable = true
 
   #---------------------------------------
+  # Vertical Pod Autoscaling
+  #---------------------------------------
+  vpa_enable = true
+
+  #---------------------------------------
   # ENABLE EMR ON EKS
+    # 1. Creates namespace
+    # 2. k8s role and role binding(emr-containers user) for the above namespace
+    # 3. IAM role for the team execution role
+    # 4. Update AWS_AUTH config map with  emr-containers user and AWSServiceRoleForAmazonEMRContainers role
+    # 5. Create a trust relationship between the job execution role and the identity of the EMR managed service account
   #---------------------------------------
   enable_emr_on_eks = true
 
