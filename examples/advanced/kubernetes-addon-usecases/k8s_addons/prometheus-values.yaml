@@ -1,21 +1,31 @@
 serviceAccounts:
   server:
     create: true
-    name:
-    annotations:
-      eks.amazonaws.com/role-arn:
 
 server:
-  # AWS MANAGED Prometheus config for remoteWrite
+  retention: 1h
   remoteWrite:
-    - url:
-      sigv4:
-        region:
-      queue_config:
+    - queue_config:
         max_samples_per_send: 1000
         max_shards: 200
         capacity: 2500
-  retention: 1h
+
+  resources:
+    requests:
+      cpu: 200m
+      memory: 512Mi
+
+  verticalAutoscaler:
+    enabled: true
+    updateMode: "Auto"
+    containerPolicies:
+      - containerName: "prometheus-server"
+        minAllowed:
+          cpu: 200m
+          memory: 512Mi
+        maxAllowed:
+          cpu: 1000m
+          memory: 2048Mi
 
   global:
     scrape_interval: 15s
