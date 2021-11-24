@@ -164,7 +164,4 @@ module "aws-eks-accelerator-for-terraform" {
 
   }
 
-  traefik_ingress_controller_enable = true
-
-
 }
