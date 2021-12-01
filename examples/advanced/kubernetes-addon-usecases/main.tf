@@ -109,8 +109,6 @@ module "aws-eks-accelerator-for-terraform" {
   kubernetes_version = local.kubernetes_version
 
   # EKS MANAGED NODE GROUPS
-  enable_managed_nodegroups = true
-  # default false
   managed_node_groups = {
     mg_4 = {
       node_group_name = "managed-ondemand"
@@ -381,12 +379,12 @@ module "aws-eks-accelerator-for-terraform" {
 
   # Optional Map value
   keda_helm_chart = {
-    name       = "keda"                                         # (Required) Release name.
+    name       = "keda"                              # (Required) Release name.
     repository = "https://kedacore.github.io/charts" # (Optional) Repository URL where to locate the requested chart.
-    chart      = "keda"                                         # (Required) Chart name to be installed.
-    version    = "2.4.0"                                             # (Optional) Specify the exact chart version to install. If this is not specified, the latest version is installed.
-    namespace  = "keda"                                         # (Optional) The namespace to install the release into. Defaults to default
-    values = [templatefile("${path.module}/k8s_addons/keda-values.yaml", {})]
+    chart      = "keda"                              # (Required) Chart name to be installed.
+    version    = "2.4.0"                             # (Optional) Specify the exact chart version to install. If this is not specified, the latest version is installed.
+    namespace  = "keda"                              # (Optional) The namespace to install the release into. Defaults to default
+    values     = [templatefile("${path.module}/k8s_addons/keda-values.yaml", {})]
   }
 
   #---------------------------------------

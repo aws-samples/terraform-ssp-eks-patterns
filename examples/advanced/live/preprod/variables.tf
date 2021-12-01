@@ -130,31 +130,18 @@ variable "kube_proxy_addon_version" {
 }
 
 # EKS WORKER NODES
-variable "enable_managed_nodegroups" {
-  description = "Enable self-managed worker groups"
-  type        = bool
-  default     = false
-}
 variable "managed_node_groups" {
   description = "Managed Node groups configuration"
   type        = any
   default     = {}
 }
-variable "enable_self_managed_nodegroups" {
-  description = "Enable self-managed worker groups"
-  type        = bool
-  default     = false
-}
+
 variable "self_managed_node_groups" {
   description = "Self-Managed Node groups configuration"
   type        = any
   default     = {}
 }
-variable "enable_fargate" {
-  description = "Enable Fargate profiles"
-  type        = bool
-  default     = false
-}
+
 variable "fargate_profiles" {
   description = "Fargate Profile configuration"
   type        = any

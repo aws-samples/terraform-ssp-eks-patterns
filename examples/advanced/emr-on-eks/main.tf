@@ -112,12 +112,11 @@ module "aws-eks-accelerator-for-terraform" {
   kubernetes_version = local.kubernetes_version
 
   # EKS MANAGED NODE GROUPS
-  enable_managed_nodegroups = true # default false
   managed_node_groups = {
     mg_4 = {
       node_group_name = "managed-ondemand"
       instance_types  = ["m5.xlarge"]
-      min_size   = "3"
+      min_size        = "3"
       subnet_ids      = module.aws_vpc.private_subnets
     }
   }
