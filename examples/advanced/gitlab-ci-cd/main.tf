@@ -64,7 +64,7 @@ module "aws_vpc" {
 # Example to consume aws-eks-accelerator-for-terraform module
 #---------------------------------------------------------------
 module "aws-eks-accelerator-for-terraform" {
-  source = "github.com/aws-samples/aws-eks-accelerator-for-terraform.git?ref=gitlab-ci-cd"
+  source = "github.com/aws-samples/aws-eks-accelerator-for-terraform.git"
 
   tenant            = local.tenant
   environment       = local.environment
