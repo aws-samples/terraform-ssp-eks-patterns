@@ -8,7 +8,6 @@ terraform_version = "Terraform v1.0.1"
 create_eks         = true
 kubernetes_version = "1.21"
 
-enable_managed_nodegroups = true
 managed_node_groups = {
   #---------------------------------------------------------#
   # ON-DEMAND Worker Group - Worker Group - 1
@@ -131,7 +130,6 @@ managed_node_groups = {
     */
 } # END OF MANAGED NODE GROUPS
 
-enable_self_managed_nodegroups = true
 self_managed_node_groups = {
   #---------------------------------------------------------#
   # ON-DEMAND Self Managed Worker Group - Worker Group - 1
@@ -262,7 +260,6 @@ self_managed_node_groups = {
 */
 } # END OF SELF MANAGED NODE GROUPS
 
-enable_fargate = false
 fargate_profiles = {
   default = {
     fargate_profile_name = "default"

@@ -109,7 +109,6 @@ module "aws_eks_accelerator" {
   kubernetes_version = local.kubernetes_version
 
   # MANAGED NODE GROUPS
-  enable_managed_nodegroups = true # default false
   managed_node_groups = {
     mng_spot_medium = {
       node_group_name = "mng-spot-med"
@@ -120,9 +119,6 @@ module "aws_eks_accelerator" {
       disk_size       = 30
     }
   }
-
-  # SELF-MANAGED NODE GROUPS
-  enable_self_managed_nodegroups = true # default false
 
   # Enable Windows support
   enable_windows_support = true # default false
