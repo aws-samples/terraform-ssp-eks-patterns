@@ -49,4 +49,4 @@ spec:
   selector:
     app: aspnet
   sessionAffinity: None
-  type: LoadBalancer
+  type: ClusterIP
