@@ -81,7 +81,7 @@ module "aws_vpc" {
 #---------------------------------------------------------------
 
 module "aws-eks-accelerator-for-terraform" {
-  source = "/Users/znadav/projects/github/aws-eks-accelerator-for-terraform"
+  source = "github.com/aws-samples/aws-eks-accelerator-for-terraform"
 
   tenant            = local.tenant
   environment       = local.environment
