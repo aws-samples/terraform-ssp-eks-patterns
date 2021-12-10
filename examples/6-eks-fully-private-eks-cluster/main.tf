@@ -176,13 +176,14 @@ module "vpc_endpoints" {
     kms = {
       service             = "kms"
       private_dns_enabled = true
-    },
+    }
 
+    
+  }
     tags = {
       Project  = "EKS"
       Endpoint = "true"
     }
-  }
 }
 
 #---------------------------------------------------------------
