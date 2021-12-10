@@ -95,7 +95,7 @@ module "aws_vpc" {
 # Example to consume aws-eks-accelerator-for-terraform module
 #---------------------------------------------------------------
 module "aws-eks-accelerator-for-terraform" {
-  source     = "github.com/aws-samples/aws-eks-accelerator-for-terraform"
+  source     = "/Users/vabonthu/Documents/GITHUB/aws-eks-accelerator-for-terraform"
   create_eks = true
 
   tenant            = local.tenant
@@ -108,11 +108,20 @@ module "aws-eks-accelerator-for-terraform" {
   private_subnet_ids = module.aws_vpc.private_subnets
 
   # EKS CONTROL PLANE VARIABLES
-
   kubernetes_version = local.kubernetes_version
 
-  # EKS MANAGED NODE GROUPS
+  # EKS Addons
+  enable_vpc_cni_addon = true
+  enable_coredns_addon = true
+//  enable_ebs_csi_driver_addon = true
+  enable_kube_proxy_addon = true
 
+  vpc_cni_addon_version = "v1.10.1-eksbuild.1"
+  coredns_addon_version = "v1.8.4-eksbuild.1"
+  kube_proxy_addon_version = "v1.21.2-eksbuild.2"
+//  ebs_csi_driver_addon_verson = "v1.4.0-eksbuild.preview"
+
+  # EKS MANAGED NODE GROUPS
   managed_node_groups = {
     mg_4 = {
       node_group_name = "managed-ondemand"
@@ -163,5 +172,10 @@ module "aws-eks-accelerator-for-terraform" {
     }
 
   }
+
+  #---------------------------------------
+  # ENABLE YuniKorn batch Scheduler for Spark Applications
+  #---------------------------------------
+  yunikorn_enable = true
 
 }

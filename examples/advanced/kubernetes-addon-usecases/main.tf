@@ -402,4 +402,17 @@ module "aws-eks-accelerator-for-terraform" {
     values     = [templatefile("${path.module}/k8s_addons/vpa-values.yaml", {})]
   }
 
+  #---------------------------------------
+  # Apache YuniKorn K8s Spark Scheduler
+  #---------------------------------------
+  yunikorn_enable = true
+
+  yunikorn_helm_chart = {
+    name       = "yunikorn"                                 # (Required) Release name.
+    repository = "https://apache.github.io/incubator-yunikorn-release" # (Optional) Repository URL where to locate the requested chart.
+    chart      = "yunikorn"                                 # (Required) Chart name to be installed.
+    version    = "0.12.0"                               # (Optional) Specify the exact chart version to install. If this is not specified, the latest version is installed.
+    values     = [templatefile("${path.module}/k8s_addons/yunikorn-values.yaml", {})]
+  }
+
 }
