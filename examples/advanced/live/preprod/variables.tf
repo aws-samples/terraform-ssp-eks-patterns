@@ -129,7 +129,6 @@ variable "kube_proxy_addon_version" {
   description = "KubeProxy Addon version"
 }
 
-# EKS WORKER NODES
 variable "managed_node_groups" {
   description = "Managed Node groups configuration"
   type        = any

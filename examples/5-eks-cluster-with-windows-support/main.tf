@@ -112,6 +112,7 @@ module "aws_eks_accelerator" {
   vpc_cni_addon_version = "v1.10.1-eksbuild.1"
 
   # MANAGED NODE GROUPS
+
   managed_node_groups = {
     mng_spot_medium = {
       node_group_name = "mng-spot-med"

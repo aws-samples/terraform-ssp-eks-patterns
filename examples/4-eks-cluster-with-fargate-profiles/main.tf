@@ -112,6 +112,7 @@ module "aws-eks-accelerator-for-terraform" {
   #---------------------------------------------------------#
   # FARGATE PROFILES
   #---------------------------------------------------------#
+
   fargate_profiles = {
     default = {
       fargate_profile_name = "default"
