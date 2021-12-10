@@ -109,7 +109,6 @@ module "aws-eks-accelerator-for-terraform" {
   create_eks         = true
   kubernetes_version = local.kubernetes_version
 
-  enable_self_managed_nodegroups = true
   self_managed_node_groups = {
     #---------------------------------------------------------#
     # ON-DEMAND Self Managed Worker Group - Worker Group - 1

@@ -80,7 +80,7 @@ module "aws-eks-accelerator-for-terraform" {
   kubernetes_version = local.kubernetes_version
 
   # EKS MANAGED NODE GROUPS
-  enable_managed_nodegroups = true # default false
+
   managed_node_groups = {
     mg_4 = {
       node_group_name = "managed-ondemand"
