@@ -140,11 +140,7 @@ variable "self_managed_node_groups" {
   type        = any
   default     = {}
 }
-variable "enable_fargate" {
-  description = "Enable Fargate profiles"
-  type        = bool
-  default     = false
-}
+
 variable "fargate_profiles" {
   description = "Fargate Profile configuration"
   type        = any

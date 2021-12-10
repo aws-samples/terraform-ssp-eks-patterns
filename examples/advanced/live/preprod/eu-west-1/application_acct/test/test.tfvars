@@ -261,7 +261,6 @@ self_managed_node_groups = {
 */
 } # END OF SELF MANAGED NODE GROUPS
 
-enable_fargate = false
 fargate_profiles = {
   default = {
     fargate_profile_name = "default"

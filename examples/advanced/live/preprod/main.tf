@@ -93,7 +93,6 @@ module "aws-eks-accelerator-for-terraform" {
   #---------------------------------------------------------#
   # FARGATE PROFILES
   #---------------------------------------------------------#
-  enable_fargate   = var.enable_fargate
   fargate_profiles = var.fargate_profiles
 
   #---------------------------------------
