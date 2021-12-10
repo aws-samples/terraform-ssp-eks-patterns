@@ -1,21 +1,3 @@
-/*
- * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
- * SPDX-License-Identifier: MIT-0
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this
- * software and associated documentation files (the "Software"), to deal in the Software
- * without restriction, including without limitation the rights to use, copy, modify,
- * merge, publish, distribute, sublicense, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
- * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
- * PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
- * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
- * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
- * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- */
-
 terraform {
   required_version = ">= 1.0.1"
 
@@ -31,6 +13,10 @@ terraform {
     helm = {
       source  = "hashicorp/helm"
       version = ">= 2.4.1"
+    }
+    kubectl = {
+      source  = "gavinbunney/kubectl"
+      version = ">= 1.7.0"
     }
   }
 }
@@ -51,9 +37,9 @@ data "aws_region" "current" {}
 data "aws_availability_zones" "available" {}
 
 locals {
-  tenant      = "aws001"  # AWS account name or unique id for tenant
-  environment = "preprod" # Environment area eg., preprod or prod
-  zone        = "dev"     # Environment with in one sub_tenant or business unit
+  tenant      = "teams-account" # AWS account name or unique id for tenant
+  environment = "sandbox"       # Environment area eg., preprod or prod
+  zone        = "demo2"          # Environment with in one sub_tenant or business unit
 
   kubernetes_version = "1.21"
 
@@ -78,7 +64,6 @@ module "aws_vpc" {
   enable_nat_gateway   = true
   create_igw           = true
   enable_dns_hostnames = true
-  single_nat_gateway   = true
 
   public_subnet_tags = {
     "kubernetes.io/cluster/${local.cluster_name}" = "shared"
@@ -92,8 +77,9 @@ module "aws_vpc" {
 
 }
 #---------------------------------------------------------------
-# Example to consume aws-eks-accelerator-for-terraform module
+# Example to consume aws-eks-accelerator-for-terraform module with Teams (Application and Platform)
 #---------------------------------------------------------------
+
 module "aws-eks-accelerator-for-terraform" {
   source = "github.com/aws-samples/aws-eks-accelerator-for-terraform"
 
@@ -110,8 +96,11 @@ module "aws-eks-accelerator-for-terraform" {
   create_eks         = true
   kubernetes_version = local.kubernetes_version
 
-  # EKS MANAGED NODE GROUPS
+  tags = {
+    "SSP-TF-Teams" = "true"
+  }
 
+  # EKS MANAGED NODE GROUPS
   managed_node_groups = {
     mg_4 = {
       node_group_name = "managed-ondemand"
@@ -120,4 +109,69 @@ module "aws-eks-accelerator-for-terraform" {
     }
   }
 
+  platform_teams = {
+    admin-team-1 = {
+      ## Users Example:
+      # users = [
+      #   "arn:aws:iam::<ACCOUNT_ID>:user/<USERNAME>",
+      #   "arn:aws:iam::<ACCOUNT_ID>:role/<ROLE_NAME>"
+      # ]
+      users = [
+      ]
+    }
+  }
+
+  # EKS Teams
+  application_teams = {
+    team-red = {
+      "labels" = {
+        "appName"     = "read-team-app",
+        "projectName" = "project-red",
+        "environment" = "example",
+        "domain"      = "example",
+        "uuid"        = "example",
+        "billingCode" = "example",
+        "branch"      = "example"
+      }
+      "quota" = {
+        "requests.cpu"    = "1000m",
+        "requests.memory" = "4Gi",
+        "limits.cpu"      = "2000m",
+        "limits.memory"   = "8Gi",
+        "pods"            = "10",
+        "secrets"         = "10",
+        "services"        = "10"
+      }
+      ## Manifests Example:
+      manifests_dir = "./manifests-team-red"
+      ## Users Example:
+      # users = [
+      #   "arn:aws:iam::<ACCOUNT_ID>:user/<USERNAME>",
+      #   "arn:aws:iam::<ACCOUNT_ID>:role/<ROLE_NAME>"
+      # ]
+    }
+
+    team-blue = {
+      "labels" = {
+        "appName"     = "blue-team-app",
+        "projectName" = "project-blue",
+      }
+      "quota" = {
+        "requests.cpu"    = "2000m",
+        "requests.memory" = "4Gi",
+        "limits.cpu"      = "4000m",
+        "limits.memory"   = "16Gi",
+        "pods"            = "20",
+        "secrets"         = "20",
+        "services"        = "20"
+      }
+      ## Manifests Example:
+      manifests_dir = "./manifests-team-blue"
+      ## Users Example:
+      # users = [
+      #   "arn:aws:iam::<ACCOUNT_ID>:user/<USERNAME>",
+      #   "arn:aws:iam::<ACCOUNT_ID>:role/<ROLE_NAME>"
+      # ]
+    }
+  }
 }

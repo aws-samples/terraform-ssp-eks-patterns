@@ -22,15 +22,15 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 3.60.0"
+      version = ">= 3.66.0"
     }
     kubernetes = {
       source  = "hashicorp/kubernetes"
-      version = "~> 2.5.0"
+      version = ">= 2.6.1"
     }
     helm = {
       source  = "hashicorp/helm"
-      version = "~> 2.3.0"
+      version = ">= 2.4.1"
     }
   }
 }
@@ -176,13 +176,14 @@ module "vpc_endpoints" {
     kms = {
       service             = "kms"
       private_dns_enabled = true
-    },
+    }
 
+    
+  }
     tags = {
       Project  = "EKS"
       Endpoint = "true"
     }
-  }
 }
 
 #---------------------------------------------------------------

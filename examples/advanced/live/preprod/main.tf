@@ -78,6 +78,7 @@ module "aws-eks-accelerator-for-terraform" {
   #---------------------------------------------------------#
   # EKS WORKER NODE GROUPS
   #---------------------------------------------------------#
+
   managed_node_groups       = var.managed_node_groups
 
   #---------------------------------------------------------#

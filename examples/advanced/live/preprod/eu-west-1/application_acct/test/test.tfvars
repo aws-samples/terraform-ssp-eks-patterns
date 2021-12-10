@@ -8,7 +8,6 @@ terraform_version = "Terraform v1.0.1"
 create_eks         = true
 kubernetes_version = "1.21"
 
-
 managed_node_groups = {
   #---------------------------------------------------------#
   # ON-DEMAND Worker Group - Worker Group - 1
