@@ -22,15 +22,15 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = ">= 3.66.0"
+      version = "~> 3.66.0"
     }
     kubernetes = {
       source  = "hashicorp/kubernetes"
-      version = ">= 2.6.1"
+      version = "~> 2.6.1"
     }
     helm = {
       source  = "hashicorp/helm"
-      version = ">= 2.4.1"
+      version = "~> 2.4.1"
     }
   }
 }
@@ -76,7 +76,6 @@ module "aws_vpc" {
   enable_nat_gateway   = true
   create_igw           = true
   enable_dns_hostnames = true
-  single_nat_gateway   = true
 
   public_subnet_tags = {
     "kubernetes.io/cluster/${local.cluster_name}" = "shared"
@@ -93,7 +92,7 @@ module "aws_vpc" {
 # Example to consume aws-eks-accelerator-for-terraform module
 #---------------------------------------------------------------
 module "aws_eks_accelerator" {
-  source = "github.com/aws-samples/aws-eks-accelerator-for-terraform"
+  source = "git@github.com:aws-samples/aws-eks-accelerator-for-terraform.git"
 
   tenant            = local.tenant
   environment       = local.environment
@@ -108,6 +107,10 @@ module "aws_eks_accelerator" {
   create_eks         = true
   kubernetes_version = local.kubernetes_version
 
+  # Ensure AWS VPC CNI is used
+  enable_vpc_cni_addon  = true
+  vpc_cni_addon_version = "v1.10.1-eksbuild.1"
+
   # MANAGED NODE GROUPS
   managed_node_groups = {
     mng_spot_medium = {
@@ -120,6 +123,7 @@ module "aws_eks_accelerator" {
     }
   }
 
+  # SELF-MANAGED NODE GROUPS
   # Enable Windows support
   enable_windows_support = true # default false
 
