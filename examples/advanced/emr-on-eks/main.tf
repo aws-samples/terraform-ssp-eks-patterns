@@ -108,11 +108,9 @@ module "aws-eks-accelerator-for-terraform" {
   private_subnet_ids = module.aws_vpc.private_subnets
 
   # EKS CONTROL PLANE VARIABLES
-
   kubernetes_version = local.kubernetes_version
 
   # EKS MANAGED NODE GROUPS
-
   managed_node_groups = {
     mg_4 = {
       node_group_name = "managed-ondemand"
@@ -163,5 +161,10 @@ module "aws-eks-accelerator-for-terraform" {
     }
 
   }
+
+  #---------------------------------------
+  # ENABLE YuniKorn batch Scheduler for Spark Applications
+  #---------------------------------------
+  yunikorn_enable = true
 
 }
