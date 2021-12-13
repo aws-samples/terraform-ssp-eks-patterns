@@ -1,4 +1,4 @@
-# EMR on EKS Deployment 
+# EMR on EKS Deployment
 
 This example deploys the following resources
 
@@ -18,16 +18,16 @@ Login to AWS Account with Adimistrator role privileges for this demo
 - Open `CloudShell` service fromm the search bar
 
 - Instal Terraform using the following commands
-  
+
 ```sh
    sudo yum install -y yum-utils
    sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo
-   
+
    sudo yum -y install terraform
-   
+
    terraform -help
    terraform version
-   
+
    touch ~/.bashrc
    terraform -install-autocomplete
 ```
@@ -50,19 +50,19 @@ cd terraform-ssp-eks-patterns/examples/advanced/emr-on-eks
 ### Step4: Install Terraform in CloudShell
 
 - Run Terraform init to intialize the modules
-  
+
 ```sh
 terraform init
 ```
 
-- Run Terraform plan to verify the resources created by this execution. 
+- Run Terraform plan to verify the resources created by this execution.
 
 ```sh
 export AWS_REGION="eu-west-1"   # Select your own region
 terraform plan
 ```
 
-- Run Terraform Apply to deploy the solution. 
+- Run Terraform Apply to deploy the solution.
 
 ```
 terraform apply --auto-approve
@@ -105,20 +105,20 @@ if [[ $VIRTUAL_CLUSTER_ID = "" ]]; then
   }'
 ```
 
-### Step7: Execute the Spark Job 
+### Step7: Execute the Spark Job
 
 - Execute the Spark job with Prometheus metrcis configuraiton
 
 ```sh
 #!/bin/bash
 
-# INPUT VARIABLES 
+# INPUT VARIABLES
 EMR_ON_EKS_ROLE_ID="aws001-preprod-test-emr-eks-data-team-a"       # Replace EMR IAM role with your ID
 EKS_CLUSTER_ID='aws001-preprod-test-eks'                           # Replace cluster id with your id
 EMR_ON_EKS_NAMESPACE='emr-data-team-a'                             # Replace namespace with your namespace
-JOB_NAME='pi'                                   
+JOB_NAME='pi'  
 
-# FIND ROLE ARN and EMR VIRTUAL CLUSTER ID 
+# FIND ROLE ARN and EMR VIRTUAL CLUSTER ID
 EMR_ROLE_ARN=$(aws iam get-role --role-name $EMR_ON_EKS_ROLE_ID --query Role.Arn --output text)
 VIRTUAL_CLUSTER_ID=$(aws emr-containers list-virtual-clusters --query "virtualClusters[?name=='${EKS_CLUSTER_ID}' && state=='RUNNING'].id" --output text)
 

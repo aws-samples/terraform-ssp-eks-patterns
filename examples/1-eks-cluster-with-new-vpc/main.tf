@@ -110,6 +110,7 @@ module "aws-eks-accelerator-for-terraform" {
   create_eks         = true
   kubernetes_version = local.kubernetes_version
 
+
   # EKS MANAGED NODE GROUPS
 
   managed_node_groups = {

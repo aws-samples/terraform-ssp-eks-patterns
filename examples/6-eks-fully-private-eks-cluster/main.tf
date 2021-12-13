@@ -178,12 +178,12 @@ module "vpc_endpoints" {
       private_dns_enabled = true
     }
 
-    
+
   }
-    tags = {
-      Project  = "EKS"
-      Endpoint = "true"
-    }
+  tags = {
+    Project  = "EKS"
+    Endpoint = "true"
+  }
 }
 
 #---------------------------------------------------------------

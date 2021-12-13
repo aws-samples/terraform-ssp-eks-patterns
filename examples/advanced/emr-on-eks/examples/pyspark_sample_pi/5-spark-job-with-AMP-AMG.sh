@@ -1,15 +1,15 @@
 #!/bin/bash
-# INPUT VARIABLES 
+# INPUT VARIABLES
 EMR_VIRTUAL_CLUSTER_ID=$1 # EMR Cluster ID
 S3_BUCKET=$2              # This script requires s3 bucket as input parameter e.g., s3://<bucket-name>
 
 EMR_ON_EKS_ROLE_ID="aws001-preprod-test-emr-eks-data-team-a"       # Replace EMR IAM role with your ID
 EMR_ON_EKS_NAMESPACE='emr-data-team-a'                             # Replace namespace with your namespace
-JOB_NAME='taxidata'                                   
+JOB_NAME='taxidata'
 CW_LOG_GROUP="/emr-on-eks-logs/${EMR_VIRTUAL_CLUSTER_ID}/${EMR_ON_EKS_NAMESPACE}" # Create CW Log group if not exist
 SPARK_JOB_S3_PATH="${S3_BUCKET}/${EMR_VIRTUAL_CLUSTER_ID}/${EMR_ON_EKS_NAMESPACE}/${JOB_NAME}"
 EMR_EKS_RELEASE_LABEL="emr-6.3.0-latest"
-# Copy PySpark and Test data to S3 bucket 
+# Copy PySpark and Test data to S3 bucket
 aws s3 sync ./pyspark/ "${SPARK_JOB_S3_PATH}/"
 
 # Find Role ARN and EMR Virutal Cluster ID
@@ -36,13 +36,13 @@ if [[ $VIRTUAL_CLUSTER_ID != "" ]]; then
     --configuration-overrides '{
       "applicationConfiguration": [
           {
-            "classification": "spark-defaults", 
+            "classification": "spark-defaults",
             "properties": {
               "spark.driver.memory":"2G",
               "spark.kubernetes.executor.podNamePrefix":"taxidata-executor"
             }
           }
-        ], 
+        ],
       "monitoringConfiguration": {
         "persistentAppUI":"ENABLED",
         "cloudWatchMonitoringConfiguration": {
@@ -54,4 +54,3 @@ if [[ $VIRTUAL_CLUSTER_ID != "" ]]; then
 else
   echo "Cluster is not in running state $EMR_VIRTUAL_CLUSTER_ID"
 fi
-

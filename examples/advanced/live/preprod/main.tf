@@ -79,7 +79,7 @@ module "aws-eks-accelerator-for-terraform" {
   # EKS WORKER NODE GROUPS
   #---------------------------------------------------------#
 
-  managed_node_groups       = var.managed_node_groups
+  managed_node_groups = var.managed_node_groups
 
   #---------------------------------------------------------#
   # EKS SELF MANAGED WORKER NODE GROUPS
@@ -89,7 +89,7 @@ module "aws-eks-accelerator-for-terraform" {
   windows_vpc_resource_controller_image_tag = "v0.2.7" # enable_windows_support= true
   windows_vpc_admission_webhook_image_tag   = "v0.2.7" # enable_windows_support= true
 
-  self_managed_node_groups       = var.self_managed_node_groups
+  self_managed_node_groups = var.self_managed_node_groups
 
   #---------------------------------------------------------#
   # FARGATE PROFILES

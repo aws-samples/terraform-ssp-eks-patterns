@@ -1,16 +1,16 @@
 #!/bin/bash
 
-# NOTE 
-# This job requires additional policies for EMR Role 
+# NOTE
+# This job requires additional policies for EMR Role
       # 1. S3 Object Delete
       # 2. Glue catalog create, read,write and update policies
 
-# INPUT VARIABLES 
+# INPUT VARIABLES
 EMR_ON_EKS_ROLE_ID="aws001-preprod-test-emr-eks-data-team-a"       # Replace EMR IAM role with your ID
 EKS_CLUSTER_ID='aws001-preprod-test-eks'        # Replace cluster id with your id
 EMR_ON_EKS_NAMESPACE='emr-data-team-a'                             # Replace namespace with your namespace
 EMR_VIRTUAL_CLUSTER_NAME="$EKS_CLUSTER_ID-$EMR_ON_EKS_NAMESPACE"
-JOB_NAME='taxidata'                                   
+JOB_NAME='taxidata'
 
 S3_BUCKET='s3://<enter-your-bucket-name>'                   # Create your own s3 bucket and replace this value
 CW_LOG_GROUP="/emr-on-eks-logs/${EMR_VIRTUAL_CLUSTER_NAME}/${EMR_ON_EKS_NAMESPACE}" # Create CW Log group if not exist
@@ -19,7 +19,7 @@ SPARK_JOB_S3_PATH="${S3_BUCKET}/${EMR_VIRTUAL_CLUSTER_NAME}/${EMR_ON_EKS_NAMESPA
 # Step1: COPY POD TEMPLATES TO S3 Bucket
 aws s3 sync ./pyspark/ "${SPARK_JOB_S3_PATH}/"
 
-# FIND ROLE ARN and EMR VIRTUAL CLUSTER ID 
+# FIND ROLE ARN and EMR VIRTUAL CLUSTER ID
 EMR_ROLE_ARN=$(aws iam get-role --role-name $EMR_ON_EKS_ROLE_ID --query Role.Arn --output text)
 VIRTUAL_CLUSTER_ID=$(aws emr-containers list-virtual-clusters --query "virtualClusters[?name=='${EMR_VIRTUAL_CLUSTER_NAME}' && state=='RUNNING'].id" --output text)
 
@@ -43,14 +43,14 @@ if [[ $VIRTUAL_CLUSTER_ID != "" ]]; then
     --configuration-overrides '{
       "applicationConfiguration": [
           {
-            "classification": "spark-defaults", 
+            "classification": "spark-defaults",
             "properties": {
               "spark.hadoop.hive.metastore.client.factory.class":"com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory",
               "spark.driver.memory":"2G",
               "spark.kubernetes.executor.podNamePrefix":"taxidata"
             }
           }
-        ], 
+        ],
       "monitoringConfiguration": {
         "persistentAppUI":"ENABLED",
         "cloudWatchMonitoringConfiguration": {

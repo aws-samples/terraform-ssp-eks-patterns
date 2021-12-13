@@ -342,4 +342,3 @@ cluster_autoscaler_helm_chart = {
     operating_system = "linux"
   })]
 }
-

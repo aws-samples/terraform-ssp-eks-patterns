@@ -108,4 +108,3 @@ extraVolumes: []
 
 nodeSelector:
   kubernetes.io/os: ${operating_system}
-
