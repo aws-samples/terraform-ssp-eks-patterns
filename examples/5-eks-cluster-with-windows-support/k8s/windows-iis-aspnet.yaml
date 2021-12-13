@@ -30,7 +30,7 @@ spec:
         - powershell.exe
         - -command
         - >
-          echo '<html><body><H1>Hello, <%= Environment.GetEnvironmentVariable("DEMO_NAME") %>!</H1></body><html>' > C:\\inetpub\\wwwroot\\demo.aspx; 
+          echo '<html><body><H1>Hello, <%= Environment.GetEnvironmentVariable("DEMO_NAME") %>!</H1></body><html>' > C:\\inetpub\\wwwroot\\demo.aspx;
           C:\\ServiceMonitor.exe "w3svc";
         resources: {}
       nodeSelector:

@@ -6,9 +6,9 @@ This example deploys an EKS Cluster running the Spark K8s operator into a new VP
  - Creates Internet gateway for Public Subnets and NAT Gateway for Private Subnets
  - Creates EKS Cluster Control plane with public endpoint (for demo reasons only) with one managed node group
  - Deploys Metrics server, Cluster Autoscaler and EMR on EKS Addon
- 
+
  This will install the Kubernetes Operator for Apache Spark into the namespace spark-operator. The operator by default watches and handles SparkApplications in every namespaces. If you would like to limit the operator to watch and handle SparkApplications in a single namespace, e.g., default instead, add the following option to the helm install command:
- 
+
 ## Step1:
 
 Enable Spark-K8S-Operator on EKS Cluster

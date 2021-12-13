@@ -63,4 +63,3 @@ spec:
                 name: spot-greeting-service
                 port:
                   number: 8000
-

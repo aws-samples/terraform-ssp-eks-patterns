@@ -1,9 +1,9 @@
-# In the code below, Spark reads NY Taxi Trip data from Amazon S3. 
-# The script updates the timestamp column, prints the schema and row count and finally writes the data in parquet format to Amazon S3. 
-# The last section may take time depending on the EKS cluster size. 
+# In the code below, Spark reads NY Taxi Trip data from Amazon S3.
+# The script updates the timestamp column, prints the schema and row count and finally writes the data in parquet format to Amazon S3.
+# The last section may take time depending on the EKS cluster size.
 
-# Note that the input and output location is taken as a parameter. 
-# The script is already uploaded to the S3 bucket and command to run the 
+# Note that the input and output location is taken as a parameter.
+# The script is already uploaded to the S3 bucket and command to run the
 #     Spark ETL is shown in the section below the code snippet.
 
 import sys
@@ -35,6 +35,5 @@ if __name__ == "__main__":
     print(updatedNYTaxi.show())
 
     print("Total number of records: " + str(updatedNYTaxi.count()))
-    
-    updatedNYTaxi.write.mode("overwrite").parquet(sys.argv[2])
 
+    updatedNYTaxi.write.mode("overwrite").parquet(sys.argv[2])

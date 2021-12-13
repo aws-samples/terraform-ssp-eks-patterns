@@ -1,13 +1,13 @@
 #!/bin/bash
 
-# INPUT VARIABLES 
+# INPUT VARIABLES
 EMR_ON_EKS_ROLE_ID="aws001-preprod-test-emr-eks-data-team-a"       # Replace EMR IAM role with your ID
 EKS_CLUSTER_ID='aws001-preprod-test-eks'        # Replace cluster id with your id
 EMR_ON_EKS_NAMESPACE='emr-data-team-a'                             # Replace namespace with your namespace
 EMR_VIRTUAL_CLUSTER_NAME="$EKS_CLUSTER_ID-$EMR_ON_EKS_NAMESPACE"
-JOB_NAME='pi'                                   
+JOB_NAME='pi'
 
-# FIND ROLE ARN and EMR VIRTUAL CLUSTER ID 
+# FIND ROLE ARN and EMR VIRTUAL CLUSTER ID
 EMR_ROLE_ARN=$(aws iam get-role --role-name $EMR_ON_EKS_ROLE_ID --query Role.Arn --output text)
 VIRTUAL_CLUSTER_ID=$(aws emr-containers list-virtual-clusters --query "virtualClusters[?name=='${EMR_VIRTUAL_CLUSTER_NAME}' && state=='RUNNING'].id" --output text)
 

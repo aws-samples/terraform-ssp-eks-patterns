@@ -28,4 +28,3 @@ fi
 
 # CREATE CLOUDWATCH LOG GROUP FOR SPARK JOBS
 aws logs create-log-group --log-group-name /emr-on-eks-logs/$EMR_VIRTUAL_CLUSTER_ID/$EMR_ON_EKS_NAMESPACE
-

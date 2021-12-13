@@ -26,7 +26,7 @@ terraform {
     }
     kubernetes = {
       source  = "hashicorp/kubernetes"
-      version = ">= 2.6.1"
+      version = ">= 2.7.1"
     }
     helm = {
       source  = "hashicorp/helm"
@@ -95,7 +95,7 @@ module "aws_vpc" {
 # Example to consume aws-eks-accelerator-for-terraform module
 #---------------------------------------------------------------
 module "aws-eks-accelerator-for-terraform" {
-  source     = "github.com/aws-samples/aws-eks-accelerator-for-terraform"
+  source     = "/Users/vabonthu/Documents/GITHUB/aws-eks-accelerator-for-terraform"
   create_eks = true
 
   tenant            = local.tenant
@@ -134,10 +134,18 @@ module "aws-eks-accelerator-for-terraform" {
   #---------------------------------------
   prometheus_enable = true
 
-  #---------------------------------------
-  # Vertical Pod Autoscaling
-  #---------------------------------------
-  vpa_enable = true
+  # Optional Map value
+  prometheus_helm_chart = {
+    name       = "prometheus"                                         # (Required) Release name.
+    repository = "https://prometheus-community.github.io/helm-charts" # (Optional) Repository URL where to locate the requested chart.
+    chart      = "prometheus"                                         # (Required) Chart name to be installed.
+    version    = "14.4.0"                                             # (Optional) Specify the exact chart version to install. If this is not specified, the latest version is installed.
+    namespace  = "prometheus"                                         # (Optional) The namespace to install the release into. Defaults to default
+    values = [templatefile("${path.module}/k8s_addons/prometheus-values.yaml", {
+      operating_system = "linux"
+    })]
+
+  }
 
   #---------------------------------------
   # ENABLE EMR ON EKS
@@ -163,8 +171,31 @@ module "aws-eks-accelerator-for-terraform" {
   }
 
   #---------------------------------------
-  # ENABLE YuniKorn batch Scheduler for Spark Applications
+  # Vertical Pod Autoscaling
+  #---------------------------------------
+  vpa_enable = true
+
+  vpa_helm_chart = {
+    name       = "vpa"                                 # (Required) Release name.
+    repository = "https://charts.fairwinds.com/stable" # (Optional) Repository URL where to locate the requested chart.
+    chart      = "vpa"                                 # (Required) Chart name to be installed.
+    version    = "0.5.0"                               # (Optional) Specify the exact chart version to install. If this is not specified, the latest version is installed.
+    namespace  = "vpa-ns"                              # (Optional) The namespace to install the release into. Defaults to default
+    values     = [templatefile("${path.module}/k8s_addons/vpa-values.yaml", {})]
+  }
+
+  #---------------------------------------
+  # Apache YuniKorn K8s Spark Scheduler
   #---------------------------------------
   yunikorn_enable = true
+
+  yunikorn_helm_chart = {
+    name       = "yunikorn"                                            # (Required) Release name.
+    repository = "https://apache.github.io/incubator-yunikorn-release" # (Optional) Repository URL where to locate the requested chart.
+    chart      = "yunikorn"                                            # (Required) Chart name to be installed.
+    version    = "0.11.0"                                              # (Optional) Specify the exact chart version to install. If this is not specified, the latest version is installed.
+    values     = [templatefile("${path.module}/k8s_addons/yunikorn-values.yaml", {})]
+  }
+
 
 }

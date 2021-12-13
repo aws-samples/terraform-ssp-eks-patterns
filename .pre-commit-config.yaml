@@ -1,0 +1,22 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.0.1
+    hooks:
+      - id: trailing-whitespace
+        args: ['--markdown-linebreak-ext=md']
+      - id: check-yaml
+        exclude: '[\w\-\/]+/templates/'
+      - id: end-of-file-fixer
+      - id: check-merge-conflict
+      - id: no-commit-to-branch
+        args: [--branch, main]
+      - id: detect-private-key
+      - id: detect-aws-credentials
+        args: ['--allow-missing-credentials']
+  - repo: git://github.com/antonbabenko/pre-commit-terraform
+    rev: v1.53.0
+    hooks:
+      - id: terraform_fmt
+      - id: terraform_validate
+      - id: terraform_tflint
+default_stages: [commit, push]
