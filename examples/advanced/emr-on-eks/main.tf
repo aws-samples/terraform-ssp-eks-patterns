@@ -95,7 +95,7 @@ module "aws_vpc" {
 # Example to consume aws-eks-accelerator-for-terraform module
 #---------------------------------------------------------------
 module "aws-eks-accelerator-for-terraform" {
-  source     = "/Users/vabonthu/Documents/GITHUB/aws-eks-accelerator-for-terraform"
+  source     = "github.com/aws-samples/aws-eks-accelerator-for-terraform"
   create_eks = true
 
   tenant            = local.tenant
@@ -187,7 +187,7 @@ module "aws-eks-accelerator-for-terraform" {
   #---------------------------------------
   # Apache YuniKorn K8s Spark Scheduler
   #---------------------------------------
-  yunikorn_enable = true
+  yunikorn_enable = false
 
   yunikorn_helm_chart = {
     name       = "yunikorn"                                            # (Required) Release name.
