@@ -1,3 +1,4 @@
+
 /*
  * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
  * SPDX-License-Identifier: MIT-0
@@ -114,48 +115,77 @@ module "aws-eks-accelerator-for-terraform" {
 
   managed_node_groups = {
     mg_4 = {
-      node_group_name = "managed-ondemand"
-      instance_types  = ["m5.xlarge"]
-      subnet_ids      = module.aws_vpc.private_subnets
-    }
+      # 1> Node Group configuration - Part1
+      node_group_name        = "managed-ondemand" # Max 40 characters for node group name
+      create_launch_template = true               # false will use the default launch template
+      launch_template_os     = "amazonlinux2eks"  # amazonlinux2eks or bottlerocket
+      public_ip              = false              # Use this to enable public IP for EC2 instances; only for public subnets used in launch templates ;
+      pre_userdata           = <<-EOT
+            yum install -y amazon-ssm-agent
+            systemctl enable amazon-ssm-agent && systemctl start amazon-ssm-agent"
+        EOT
+      # 2> Node Group scaling configuration
+      desired_size    = 3
+      max_size        = 12
+      min_size        = 3
+      max_unavailable = 1 # or percentage = 20
+
+      # 3> Node Group compute configuration
+      ami_type       = "AL2_x86_64" # AL2_x86_64, AL2_x86_64_GPU, AL2_ARM_64, CUSTOM
+      capacity_type  = "ON_DEMAND"  # ON_DEMAND or SPOT
+      instance_types = ["m4.large"] # List of instances used only for SPOT type
+      disk_size      = 50
+
+      # 4> Node Group network configuration
+      subnet_ids = module.aws_vpc.public_subnets
+
+      k8s_taints = []
+
+      k8s_labels = {
+        Environment = "preprod"
+        Zone        = "dev"
+        WorkerType  = "ON_DEMAND"
+      }
+      additional_tags = {
+        ExtraTag    = "m5x-on-demand"
+        Name        = "m5x-on-demand"
+        subnet_type = "public"
+      }
+
+    },
   }
 
-  metrics_server_enable     = true
-  cluster_autoscaler_enable = true
-  #---------------------------------------
-  # COMMUNITY PROMETHEUS ENABLE
-  #---------------------------------------
-  prometheus_enable = true
 
-  # Optional Map value
-  prometheus_helm_chart = {
-    name       = "prometheus"                                         # (Required) Release name.
-    repository = "https://prometheus-community.github.io/helm-charts" # (Optional) Repository URL where to locate the requested chart.
-    chart      = "prometheus"                                         # (Required) Chart name to be installed.
-    version    = "14.4.0"                                             # (Optional) Specify the exact chart version to install. If this is not specified, the latest version is installed.
-    namespace  = "prometheus"                                         # (Optional) The namespace to install the release into. Defaults to default
-    values = [templatefile("${path.module}/k8s_addons/prometheus-values.yaml", {
-      operating_system = "linux"
+}
+
+module "kubernetes-addons" {
+  source                       = "github.com/aws-samples/aws-eks-accelerator-for-terraform//kubernetes-addons"
+  eks_cluster_id               = module.aws-eks-accelerator-for-terraform.eks_cluster_id
+  eks_worker_security_group_id = module.aws-eks-accelerator-for-terraform.worker_security_group_id
+
+  #K8s Add-ons
+  enable_metrics_server     = true
+  enable_cluster_autoscaler = true
+
+  #---------------------------------------
+  # ENABLE AGONES
+  #---------------------------------------
+  # NOTE: Agones requires a Node group in Public Subnets and enable Public IP
+  enable_agones = true
+  # Optional  agones_helm_chart
+  agones_helm_config = {
+    name               = "agones"
+    chart              = "agones"
+    repository         = "https://agones.dev/chart/stable"
+    version            = "1.15.0"
+    namespace          = "kube-system"
+    gameserver_minport = 7000 # required for sec group changes to worker nodes
+    gameserver_maxport = 8000 # required for sec group changes to worker nodes
+    values = [templatefile("${path.module}/helm_values/agones-values.yaml", {
+      expose_udp            = true
+      gameserver_namespaces = "{${join(",", ["default", "xbox-gameservers", "xbox-gameservers"])}}"
+      gameserver_minport    = 7000
+      gameserver_maxport    = 8000
     })]
-
   }
-
-  #---------------------------------------
-  # ENABLE SPARK on K8S OPERATOR
-  #---------------------------------------
-  spark_on_k8s_operator_enable = true
-
-  # Optional Map value
-  spark_on_k8s_operator_helm_chart = {
-    name             = "spark-operator"
-    chart            = "spark-operator"
-    repository       = "https://googlecloudplatform.github.io/spark-on-k8s-operator"
-    version          = "1.1.6"
-    namespace        = "spark-k8s-operator"
-    timeout          = "1200"
-    create_namespace = true
-    values           = [templatefile("${path.module}/k8s_addons/spark-k8s-operator-values.yaml", {})]
-
-  }
-
 }
