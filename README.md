@@ -1,10 +1,10 @@
 # Terraform SSP EKS Patterns
 
-Welcome to the patterns repository for the Amazon [EKS Accelerator for Terraform](https://github.com/aws-samples/aws-eks-accelerator-for-terraform) framework. This repository contains a number of examples for how you can leverage the framework to deploy multi-tenant environments on EKS with a variety of configurations. 
+Welcome to the patterns repository for the Amazon [EKS Accelerator for Terraform](https://github.com/aws-samples/aws-eks-accelerator-for-terraform) framework. This repository contains a number of examples for how you can leverage the framework to deploy multi-tenant environments on EKS with a variety of configurations.
 
-## Patterns 
+## Patterns
 
-The individual patterns can be found in the `examples` directory. 
+The individual patterns can be found in the `examples` directory.
 
 ## Documentation
 
@@ -20,7 +20,7 @@ Ensure that you have installed the following tools on your machine.
 
 ## Usage
 
-Clone the repository 
+Clone the repository
 
 ```
 git clone git@github.com:aws-samples/terraform-ssp-eks-patterns.git
@@ -29,11 +29,11 @@ git clone git@github.com:aws-samples/terraform-ssp-eks-patterns.git
 Navigate into one of the example directories and run `terraform init`
 
 ```
-cd examples/1-eks-cluster-with-new-vpc 
+cd examples/1-eks-cluster-with-new-vpc
 terraform init
 ```
 
-Run Terraform plan to verify the resources created by this execution. 
+Run Terraform plan to verify the resources created by this execution.
 
 ```
 export AWS_REGION="eu-west-1"   # Select your own region
@@ -57,7 +57,7 @@ r
 aws eks --region $AWS_REGION update-kubeconfig --name <cluster-name>
 ```
 
-Verify your `kubeconfig` is updated by listing nodes in your cluster. 
+Verify your `kubeconfig` is updated by listing nodes in your cluster.
 
 ```
 kubectl get nodes
@@ -69,7 +69,7 @@ Additionally, list pods in the `kube-system` namespace.
 kubectl get pods -n kube-system
 ```
 
-## Cleanup 
+## Cleanup
 
 To clean up your environment
 

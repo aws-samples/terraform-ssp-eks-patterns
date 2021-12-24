@@ -40,12 +40,6 @@ provider "aws" {
   alias  = "default"
 }
 
-terraform {
-  backend "local" {
-    path = "sample_local_tf_state/vpc/terraform-main.tfstate"
-  }
-}
-
 data "aws_region" "current" {}
 
 data "aws_availability_zones" "available" {}
@@ -53,11 +47,11 @@ data "aws_availability_zones" "available" {}
 locals {
   tenant      = "aws001"  # AWS account name or unique id for tenant
   environment = "preprod" # Environment area eg., preprod or prod
-  zone        = "dev"     # Environment with in one sub_tenant or business unit
+  zone        = "test"    # Environment with in one sub_tenant or business unit
 
-  vpc_cidr     = "10.0.0.0/16"
-  vpc_name     = join("-", [local.tenant, local.environment, local.zone, "vpc"])
-  cluster_name = join("-", [local.tenant, local.environment, local.zone, "eks"])
+  vpc_cidr       = "10.1.0.0/16"
+  vpc_name       = join("-", [local.tenant, local.environment, local.zone, "vpc"])
+  eks_cluster_id = join("-", [local.tenant, local.environment, local.zone, "eks"])
 
   terraform_version = "Terraform v1.0.1"
 }
@@ -79,13 +73,13 @@ module "aws_vpc" {
   single_nat_gateway   = true
 
   public_subnet_tags = {
-    "kubernetes.io/cluster/${local.cluster_name}" = "shared"
-    "kubernetes.io/role/elb"                      = "1"
+    "kubernetes.io/cluster/${local.eks_cluster_id}" = "shared"
+    "kubernetes.io/role/elb"                        = "1"
   }
 
   private_subnet_tags = {
-    "kubernetes.io/cluster/${local.cluster_name}" = "shared"
-    "kubernetes.io/role/internal-elb"             = "1"
+    "kubernetes.io/cluster/${local.eks_cluster_id}" = "shared"
+    "kubernetes.io/role/internal-elb"               = "1"
   }
 
 }

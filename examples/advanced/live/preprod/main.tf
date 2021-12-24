@@ -78,39 +78,29 @@ module "aws-eks-accelerator-for-terraform" {
   #---------------------------------------------------------#
   # EKS WORKER NODE GROUPS
   #---------------------------------------------------------#
-
-  managed_node_groups       = var.managed_node_groups
+  managed_node_groups = var.managed_node_groups
 
   #---------------------------------------------------------#
   # EKS SELF MANAGED WORKER NODE GROUPS
   #---------------------------------------------------------#
-
-  enable_windows_support                    = var.enable_windows_support
-  windows_vpc_resource_controller_image_tag = "v0.2.7" # enable_windows_support= true
-  windows_vpc_admission_webhook_image_tag   = "v0.2.7" # enable_windows_support= true
-
-  self_managed_node_groups       = var.self_managed_node_groups
+  enable_windows_support   = var.enable_windows_support
+  self_managed_node_groups = var.self_managed_node_groups
 
   #---------------------------------------------------------#
   # FARGATE PROFILES
   #---------------------------------------------------------#
   fargate_profiles = var.fargate_profiles
 
-  #---------------------------------------
-  # METRICS SERVER HELM ADDON
-  #---------------------------------------
-  metrics_server_enable     = var.metrics_server_enable
-  metrics_server_helm_chart = var.metrics_server_helm_chart
+}
 
-  #---------------------------------------
-  # CLUSTER AUTOSCALER HELM ADDON
-  #---------------------------------------
-  cluster_autoscaler_enable     = var.cluster_autoscaler_helm_chart
-  cluster_autoscaler_helm_chart = var.cluster_autoscaler_helm_chart
+module "kubernetes-addons" {
+  source = "../../../kubernetes-addons"
 
-  #---------------------------------------
-  # TRAEFIK INGRESS CONTROLLER HELM ADDON
-  #---------------------------------------
-  traefik_ingress_controller_enable = var.traefik_ingress_controller_enable
-  traefik_helm_chart                = var.traefik_helm_chart
+  eks_cluster_id = module.aws-eks-accelerator-for-terraform.eks_cluster_id
+
+  enable_metrics_server      = var.enable_metrics_server
+  metrics_server_helm_config = var.metrics_server_helm_config
+
+  enable_cluster_autoscaler      = var.enable_cluster_autoscaler
+  cluster_autoscaler_helm_config = var.cluster_autoscaler_helm_config
 }

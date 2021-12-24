@@ -92,7 +92,7 @@ module "aws_vpc" {
 # Example to consume aws-eks-accelerator-for-terraform module
 #---------------------------------------------------------------
 module "aws_eks_accelerator" {
-  source = "git@github.com:aws-samples/aws-eks-accelerator-for-terraform.git"
+  source = "github.com/aws-samples/aws-eks-accelerator-for-terraform"
 
   tenant            = local.tenant
   environment       = local.environment
@@ -138,4 +138,14 @@ module "aws_eks_accelerator" {
       desired_size           = "2"
     }
   }
+}
+
+
+module "kubernetes-addons" {
+  source = "github.com/aws-samples/aws-eks-accelerator-for-terraform//kubernetes-addons"
+
+  eks_cluster_id = module.aws-eks-accelerator-for-terraform.eks_cluster_id
+  # EKS Managed Add-ons
+  enable_amazon_eks_vpc_cni = true
+
 }

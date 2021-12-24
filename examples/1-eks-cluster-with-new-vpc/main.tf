@@ -1,20 +1,3 @@
-/*
- * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
- * SPDX-License-Identifier: MIT-0
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this
- * software and associated documentation files (the "Software"), to deal in the Software
- * without restriction, including without limitation the rights to use, copy, modify,
- * merge, publish, distribute, sublicense, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
- * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
- * PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
- * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
- * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
- * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- */
 
 terraform {
   required_version = ">= 1.0.1"
@@ -57,9 +40,9 @@ locals {
 
   kubernetes_version = "1.21"
 
-  vpc_cidr     = "10.0.0.0/16"
-  vpc_name     = join("-", [local.tenant, local.environment, local.zone, "vpc"])
-  cluster_name = join("-", [local.tenant, local.environment, local.zone, "eks"])
+  vpc_cidr       = "10.0.0.0/16"
+  vpc_name       = join("-", [local.tenant, local.environment, local.zone, "vpc"])
+  eks_cluster_id = join("-", [local.tenant, local.environment, local.zone, "eks"])
 
   terraform_version = "Terraform v1.0.1"
 }
@@ -72,8 +55,8 @@ module "aws_vpc" {
   cidr = local.vpc_cidr
   azs  = data.aws_availability_zones.available.names
 
-  public_subnets  = [for k, v in slice(data.aws_availability_zones.available.names, 0, 3) : cidrsubnet(local.vpc_cidr, 8, k)]
-  private_subnets = [for k, v in slice(data.aws_availability_zones.available.names, 0, 3) : cidrsubnet(local.vpc_cidr, 8, k + 10)]
+  public_subnets  = [for k, v in data.aws_availability_zones.available.names : cidrsubnet(local.vpc_cidr, 8, k)]
+  private_subnets = [for k, v in data.aws_availability_zones.available.names : cidrsubnet(local.vpc_cidr, 8, k + 10)]
 
   enable_nat_gateway   = true
   create_igw           = true
@@ -81,13 +64,13 @@ module "aws_vpc" {
   single_nat_gateway   = true
 
   public_subnet_tags = {
-    "kubernetes.io/cluster/${local.cluster_name}" = "shared"
-    "kubernetes.io/role/elb"                      = "1"
+    "kubernetes.io/cluster/${local.eks_cluster_id}" = "shared"
+    "kubernetes.io/role/elb"                        = "1"
   }
 
   private_subnet_tags = {
-    "kubernetes.io/cluster/${local.cluster_name}" = "shared"
-    "kubernetes.io/role/internal-elb"             = "1"
+    "kubernetes.io/cluster/${local.eks_cluster_id}" = "shared"
+    "kubernetes.io/role/internal-elb"               = "1"
   }
 
 }
@@ -111,7 +94,6 @@ module "aws-eks-accelerator-for-terraform" {
   kubernetes_version = local.kubernetes_version
 
   # EKS MANAGED NODE GROUPS
-
   managed_node_groups = {
     mg_4 = {
       node_group_name = "managed-ondemand"
@@ -120,4 +102,44 @@ module "aws-eks-accelerator-for-terraform" {
     }
   }
 
+  # FARGATE
+  fargate_profiles = {
+    default = {
+      fargate_profile_name = "default"
+      fargate_profile_namespaces = [
+        {
+          namespace = "default"
+          k8s_labels = {
+            Environment = "preprod"
+            Zone        = "dev"
+            env         = "fargate"
+          }
+      }]
+      subnet_ids = module.aws_vpc.private_subnets
+      additional_tags = {
+        ExtraTag = "Fargate"
+      }
+    },
+  }
+
+}
+
+module "kubernetes-addons" {
+  source = "../../kubernetes-addons"
+
+  eks_cluster_id               = module.aws-eks-accelerator-for-terraform.eks_cluster_id
+  eks_oidc_issuer_url          = module.aws-eks-accelerator-for-terraform.eks_oidc_issuer_url
+  eks_oidc_provider_arn        = module.aws-eks-accelerator-for-terraform.eks_oidc_provider_arn
+  eks_worker_security_group_id = module.aws-eks-accelerator-for-terraform.worker_security_group_id
+  auto_scaling_group_names     = module.aws-eks-accelerator-for-terraform.self_managed_node_group_autoscaling_groups
+
+  # EKS Managed Add-ons
+  enable_amazon_eks_vpc_cni    = true
+  enable_amazon_eks_coredns    = true
+  enable_amazon_eks_kube_proxy = true
+
+  #K8s Add-ons
+  enable_aws_load_balancer_controller = true
+  enable_metrics_server               = true
+  enable_cluster_autoscaler           = true
 }

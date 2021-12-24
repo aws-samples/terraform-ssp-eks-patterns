@@ -309,9 +309,13 @@ fargate_profiles = {
 } # END OF FARGATE PROFILES
 
 # K8S Addons
+#---------------------------------------
+# METRICS SERVER HELM ADDON
+#---------------------------------------
+enable_metrics_server = true
 
-metrics_server_enable = true
-metrics_server_helm_chart = {
+# Optional Map value
+metrics_server_helm_config = {
   name       = "metrics-server"                                    # (Required) Release name.
   repository = "https://kubernetes-sigs.github.io/metrics-server/" # (Optional) Repository URL where to locate the requested chart.
   chart      = "metrics-server"                                    # (Required) Chart name to be installed.
@@ -321,25 +325,7 @@ metrics_server_helm_chart = {
   lint       = "true"                                              # (Optional)
 
   # (Optional) Example to show how to pass metrics-server-values.yaml
-  values = [templatefile("${path.module}/k8s_addons/metrics-server-values.yaml", {
+  values = [templatefile("${path.module}/helm_values/metrics-server-values.yaml", {
     operating_system = "linux"
   })]
 }
-
-cluster_autoscaler_enable = true
-
-cluster_autoscaler_helm_chart = {
-  name       = "cluster-autoscaler"                      # (Required) Release name.
-  repository = "https://kubernetes.github.io/autoscaler" # (Optional) Repository URL where to locate the requested chart.
-  chart      = "cluster-autoscaler"                      # (Required) Chart name to be installed.
-  version    = "9.10.7"                                  # (Optional) Specify the exact chart version to install. If this is not specified, the latest version is installed.
-  namespace  = "kube-system"                             # (Optional) The namespace to install the release into. Defaults to default
-  timeout    = "1200"                                    # (Optional)
-  lint       = "true"                                    # (Optional)
-
-  # (Optional) Example to show how to pass metrics-server-values.yaml
-  values = [templatefile("${path.module}/k8s_addons/cluster-autoscaler-vaues.yaml", {
-    operating_system = "linux"
-  })]
-}
-
