@@ -110,9 +110,27 @@ module "aws-eks-accelerator-for-terraform" {
   create_eks         = true
   kubernetes_version = local.kubernetes_version
 
+  # EKS MANAGED NODE GROUPS
+
+  managed_node_groups = {
+    mg_4 = {
+      node_group_name = "managed-ondemand"
+      instance_types  = ["m4.large"]
+      subnet_ids      = module.aws_vpc.private_subnets
+    }
+  }
+
+}
+
+module "kubernetes-addons" {
+  source = "github.com/aws-samples/aws-eks-accelerator-for-terraform//modules/kubernetes-addons"
+
+  eks_cluster_id = module.aws-eks-accelerator-for-terraform.eks_cluster_id
+
   # EKS Addons
-  enable_eks_addon_vpc_cni = true
-  eks_addon_vpc_cni_config = {
+  enable_amazon_eks_vpc_cni = true # default is false
+  #Optional
+  amazon_eks_vpc_cni_config = {
     addon_name               = "vpc-cni"
     addon_version            = "v1.10.1-eksbuild.1"
     service_account          = "aws-node"
@@ -123,9 +141,9 @@ module "aws-eks-accelerator-for-terraform" {
     tags                     = {}
   }
 
-  enable_eks_addon_coredns = true
-  # Optional config
-  eks_addon_coredns_config = {
+  enable_amazon_eks_coredns = true # default is false
+  #Optional
+  amazon_eks_coredns_config = {
     addon_name               = "coredns"
     addon_version            = "v1.8.4-eksbuild.1"
     service_account          = "coredns"
@@ -136,8 +154,9 @@ module "aws-eks-accelerator-for-terraform" {
     tags                     = {}
   }
 
-  enable_eks_addon_kube_proxy = true
-  eks_addon_kube_proxy_config = {
+  enable_amazon_eks_kube_proxy = true # default is false
+  #Optional
+  amazon_eks_kube_proxy_config = {
     addon_name               = "kube-proxy"
     addon_version            = "v1.21.2-eksbuild.2"
     service_account          = "kube-proxy"
@@ -148,8 +167,9 @@ module "aws-eks-accelerator-for-terraform" {
     tags                     = {}
   }
 
-  enable_eks_addon_aws_ebs_csi_driver = true
-  eks_addon_aws_ebs_csi_driver_config = {
+  enable_amazon_eks_aws_ebs_csi_driver = true # default is false
+  #Optional
+  amazon_eks_aws_ebs_csi_driver_config = {
     addon_name               = "aws-ebs-csi-driver"
     addon_version            = "v1.4.0-eksbuild.preview"
     service_account          = "ebs-csi-controller-sa"
@@ -158,16 +178,6 @@ module "aws-eks-accelerator-for-terraform" {
     additional_iam_policies  = []
     service_account_role_arn = ""
     tags                     = {}
-  }
-
-  # EKS MANAGED NODE GROUPS
-
-  managed_node_groups = {
-    mg_4 = {
-      node_group_name = "managed-ondemand"
-      instance_types  = ["m4.large"]
-      subnet_ids      = module.aws_vpc.private_subnets
-    }
   }
 
 }
