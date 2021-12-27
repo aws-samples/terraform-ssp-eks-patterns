@@ -8,46 +8,27 @@ This example deploys the following resources
  - Deploys Metrics server, Cluster Autoscaler, Prometheus and EMR on EKS Addon
  - Creates Amazon managed Prometheus and configures Prometheus addon to remote write metrics to AMP
 
+## Prerequisites
 
-### Step1: Login to AWS Account
 
-Login to AWS Account with Adimistrator role privileges for this demo
+Before you build the whole infrastructure, you will need to meet the following prerequisites.
 
-### Step2: Install Terraform in CloudShell
+* An AWS Account
+* _AWS CLI _ (https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
+* _Terraform 1.0.1 _ (https://learn.hashicorp.com/tutorials/terraform/install-cli)
+* kubectl - _Kubernetes CLI_ (https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/)
 
-- Open `CloudShell` service fromm the search bar
+### Step1: Clone Github Repo
 
-- Instal Terraform using the following commands
-
-```sh
-   sudo yum install -y yum-utils
-   sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo
-
-   sudo yum -y install terraform
-
-   terraform -help
-   terraform version
-
-   touch ~/.bashrc
-   terraform -install-autocomplete
-```
-
-### Step3: Clone Github Repo
-
-- Clone Terraform SSP EKS Patterns repo
+Clone `aws-eks-accelerator-for-terraform` repo and change to `emr-on-eks` directory
 
 ```sh
-git clone https://github.com/aws-samples/terraform-ssp-eks-patterns.git
+git clone https://github.com/aws-samples/aws-eks-accelerator-for-terraform.git
 
+cd aws-eks-accelerator-for-terraform/deploy/analytics/emr-on-eks
 ```
 
-- Change directory
-
-```sh
-cd terraform-ssp-eks-patterns/examples/advanced/emr-on-eks
-```
-
-### Step4: Install Terraform in CloudShell
+### Step2: Deploy EKS Cluster with EMR on EKS Resources
 
 - Run Terraform init to intialize the modules
 
@@ -68,17 +49,25 @@ terraform plan
 terraform apply --auto-approve
 ```
 
-### Step5: Verify the resources created by Terraform Apply
+### Step3: Verify the resources created by Terraform Apply
 
-- Login to EKS Console to verify the cluster is up and running
-- Verify the Prometheus Server K8s addon is running
-- Verify the AMP workspace is created
-- verify the AMG is configured
-- Verify the EMR on EKS namespace and service account is crated
+Let’s verify the resources
 
-### Step6: Create EMR Virtual Cluster
+* Login to AWS console and verify the VPC, three Private Subnets and three Public Subnets, Internet gateway and single NAT Gateway created with the prefix of aws001-prerpod-test-
+* Open the EKS service page from the AWS console to verify the EKS cluster(aws001-preprod-test-eks) with one Managed node group with an instance type of m5.xlarge.
+* Also, select the workloads dropdown under the workloads tab in EKS cluster page to verify the Prometheus Server pods under prometheus namespace, EMR on EKS Namespaces emr-data-team-a and emr-data-team-b, Vertical Pod Autoscaler pods under vpa-ns and Metrics Server & Cluster Autoscaler under kube-system namespace
+* This deployment also creates a new Amazon Managed Prometheus workspace and configures community Prometheus Server add-on to *remote write metrics*.
 
-- Execute the following command to deploy the EMR Virtual Cluster
+### Step4: Create EMR Virtual Cluster
+
+Navigate to the directory below and execute create_emr_virtual_cluster_for_eks.sh script. This command should take a few seconds to create an EMR Virtual cluster
+```sh
+cd ~/aws-eks-accelerator-for-terraform/deploy/analytics/emr-on-eks/examples
+
+./create_emr_virtual_cluster_for_eks.sh aws001-preprod-test-eks-emr-data-team-a
+```
+
+This script uses EMR_VIRTUAL_CLUSTER_ID, EKS_CLUSTER_ID and EMR_ON_EKS_NAMESPACE as inputs to create an EMR Virtual Cluster. This script also creates a CloudWatch log group to write Spark Job Driver and Executor logs to CloudWatch Logs.
 
 ```sh
 #!/bin/bash
@@ -105,9 +94,19 @@ if [[ $VIRTUAL_CLUSTER_ID = "" ]]; then
   }'
 ```
 
-### Step7: Execute the Spark Job
+### Step5: Execute the Spark Job
 
-- Execute the Spark job with Prometheus metrcis configuraiton
+Navigate to the below directory and execute the shell script by providing EMR_VIRTUAL_CLUSTER_ID and S3_BUCKET names as input parameters. Please note that you need to _create an S3 Bucket_ (https://docs.aws.amazon.com/cli/latest/reference/s3api/create-bucket.html) in the AWS account and provide the bucket's name before running this command.
+
+```shell script
+cd ~/aws-eks-accelerator-for-terraform/deploy/analytics/emr-on-eks/examples/spark-execute
+
+./5-spark-job-with-AMP-AMG.sh \
+    aws001-preprod-test-eks-emr-data-team-a \
+    s3://<enter-yourbucket-name>
+```
+
+Please check the script below for more details
 
 ```sh
 #!/bin/bash
@@ -142,22 +141,6 @@ fi
 
 ```
 
-### Step7: Verify the Spark Job running in EKS Cluster
+### Step6: Monitor Spark Submit
 
-- Verify the Spark Job running in EKS Cluster
-
-
-### Step8: Verify the Spark Metrics in Prometheus
-
-- Use portforward open Prometheus WebUI and search for the Spark Metrics
-
-### Step8: Amazon Managed Grafana config
-
-- Login to Amazon managed Grafana and add AMP as a datasource
-- Create a dashbaord using the community dashboard id
-- Visualize the Spark job metrics
-
-## Cleanup
-
-
-## Conclusion
+Login to AWS EMR Console, select the EMR Virtual Cluster and verify the job status. This should show the status as *Completed* in a few minutes, and the Spark Job execution results dataset will write to the S3 bucket under the OUTPUT folder.

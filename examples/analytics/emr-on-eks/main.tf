@@ -57,10 +57,10 @@ locals {
 
   kubernetes_version = "1.21"
 
-  vpc_cidr                            = "10.0.0.0/16"
-  vpc_name                            = join("-", [local.tenant, local.environment, local.zone, "vpc"])
-  cluster_name                        = join("-", [local.tenant, local.environment, local.zone, "eks"])
-  aws_managed_prometheus_workspace_id = join("-", ["amp-workspace", local.tenant, local.environment, local.zone, "eks"])
+  vpc_cidr                          = "10.0.0.0/16"
+  vpc_name                          = join("-", [local.tenant, local.environment, local.zone, "vpc"])
+  cluster_name                      = join("-", [local.tenant, local.environment, local.zone, "eks"])
+  amazon_prometheus_workspace_alias = join("-", ["amp-workspace", local.tenant, local.environment, local.zone, "eks"])
 
   terraform_version = "Terraform v1.0.1"
 }
@@ -96,7 +96,8 @@ module "aws_vpc" {
 # Example to consume aws-eks-accelerator-for-terraform module
 #---------------------------------------------------------------
 module "aws-eks-accelerator-for-terraform" {
-  source     = "github.com/aws-samples/aws-eks-accelerator-for-terraform"
+  source = "github.com/aws-samples/aws-eks-accelerator-for-terraform"
+
   create_eks = true
 
   tenant            = local.tenant
@@ -122,8 +123,7 @@ module "aws-eks-accelerator-for-terraform" {
   }
 
   # Enable Amazon Managed Prometheus
-  enable_aws_managed_prometheus       = true
-  aws_managed_prometheus_workspace_id = local.aws_managed_prometheus_workspace_id
+  enable_amazon_prometheus = true
 
   #---------------------------------------
   # ENABLE EMR ON EKS
@@ -150,23 +150,23 @@ module "aws-eks-accelerator-for-terraform" {
 
 }
 
-module "kubernetes-addons" {
-  source         = "github.com/aws-samples/aws-eks-accelerator-for-terraform//modules/kubernetes-addons"
+module "addons" {
+  source = "github.com/aws-samples/aws-eks-accelerator-for-terraform//modules/kubernetes-addons"
+
   eks_cluster_id = module.aws-eks-accelerator-for-terraform.eks_cluster_id
 
   #K8s Add-ons
   enable_metrics_server     = true
   enable_cluster_autoscaler = true
 
-  # Integrate Amazon Managed Prometheus with Prometheus server add-on
-  enable_aws_managed_prometheus       = true
-  aws_managed_prometheus_workspace_id = local.aws_managed_prometheus_workspace_id
+  #---------------------------------------
+  # PROMETHEUS CONFIG
+  #---------------------------------------
+  amazon_prometheus_workspace_id           = module.aws-eks-accelerator-for-terraform.amazon_prometheus_workspace_id
+  amazon_prometheus_ingest_iam_role_arn    = module.aws-eks-accelerator-for-terraform.amazon_prometheus_ingest_iam_role_arn
+  amazon_prometheus_ingest_service_account = module.aws-eks-accelerator-for-terraform.amazon_prometheus_ingest_service_account
 
-  #---------------------------------------
-  # COMMUNITY PROMETHEUS ENABLE
-  #---------------------------------------
   enable_prometheus = true
-
   # Optional Map value
   prometheus_helm_config = {
     name       = "prometheus"                                         # (Required) Release name.
@@ -182,9 +182,9 @@ module "kubernetes-addons" {
   #---------------------------------------
   # Vertical Pod Autoscaling
   #---------------------------------------
-  vpa_enable = true
+  enable_vpa = true
 
-  vpa_helm_chart = {
+  vpa_helm_config = {
     name       = "vpa"                                 # (Required) Release name.
     repository = "https://charts.fairwinds.com/stable" # (Optional) Repository URL where to locate the requested chart.
     chart      = "vpa"                                 # (Required) Chart name to be installed.
@@ -192,6 +192,5 @@ module "kubernetes-addons" {
     namespace  = "vpa-ns"                              # (Optional) The namespace to install the release into. Defaults to default
     values     = [templatefile("${path.module}/helm_values/vpa-values.yaml", {})]
   }
-
 
 }

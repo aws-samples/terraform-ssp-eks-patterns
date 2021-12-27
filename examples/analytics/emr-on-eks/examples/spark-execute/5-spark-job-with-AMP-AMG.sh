@@ -10,7 +10,7 @@ CW_LOG_GROUP="/emr-on-eks-logs/${EMR_VIRTUAL_CLUSTER_ID}/${EMR_ON_EKS_NAMESPACE}
 SPARK_JOB_S3_PATH="${S3_BUCKET}/${EMR_VIRTUAL_CLUSTER_ID}/${EMR_ON_EKS_NAMESPACE}/${JOB_NAME}"
 EMR_EKS_RELEASE_LABEL="emr-6.3.0-latest"
 # Copy PySpark and Test data to S3 bucket
-aws s3 sync ./pyspark/ "${SPARK_JOB_S3_PATH}/"
+aws s3 sync ./spark-scripts/ "${SPARK_JOB_S3_PATH}/"
 
 # Find Role ARN and EMR Virutal Cluster ID
 EMR_ROLE_ARN=$(aws iam get-role --role-name $EMR_ON_EKS_ROLE_ID --query Role.Arn --output text)

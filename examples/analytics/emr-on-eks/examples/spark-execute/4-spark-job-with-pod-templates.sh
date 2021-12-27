@@ -1,9 +1,6 @@
 #!/bin/bash
-
-# NOTE
-# This job requires additional policies for EMR Role
-      # 1. S3 Object Delete
-      # 2. Glue catalog create, read,write and update policies
+#  You can use pod template files to define the driver or executor pod’s configurations that Spark configurations do not support.
+# see Pod Template (https://spark.apache.org/docs/3.0.0-preview/running-on-kubernetes.html#pod-template).
 
 # INPUT VARIABLES
 EMR_ON_EKS_ROLE_ID="aws001-preprod-test-emr-eks-data-team-a"       # Replace EMR IAM role with your ID
@@ -17,7 +14,7 @@ CW_LOG_GROUP="/emr-on-eks-logs/${EMR_VIRTUAL_CLUSTER_NAME}/${EMR_ON_EKS_NAMESPAC
 SPARK_JOB_S3_PATH="${S3_BUCKET}/${EMR_VIRTUAL_CLUSTER_NAME}/${EMR_ON_EKS_NAMESPACE}/${JOB_NAME}"
 
 # Step1: COPY POD TEMPLATES TO S3 Bucket
-aws s3 sync ./pyspark/ "${SPARK_JOB_S3_PATH}/"
+aws s3 sync ./spark-scripts/ "${SPARK_JOB_S3_PATH}/"
 
 # FIND ROLE ARN and EMR VIRTUAL CLUSTER ID
 EMR_ROLE_ARN=$(aws iam get-role --role-name $EMR_ON_EKS_ROLE_ID --query Role.Arn --output text)
@@ -47,6 +44,8 @@ if [[ $VIRTUAL_CLUSTER_ID != "" ]]; then
             "properties": {
               "spark.hadoop.hive.metastore.client.factory.class":"com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory",
               "spark.driver.memory":"2G",
+              "spark.kubernetes.driver.podTemplateFile":"'"$SPARK_JOB_S3_PATH"'/pod-templates/spark-driver-pod-template.yaml",
+              "spark.kubernetes.executor.podTemplateFile":"'"$SPARK_JOB_S3_PATH"'/pod-templates/spark-executor-pod-template.yaml",
               "spark.kubernetes.executor.podNamePrefix":"taxidata"
             }
           }
