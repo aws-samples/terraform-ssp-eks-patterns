@@ -119,22 +119,29 @@ module "aws-eks-accelerator-for-terraform" {
       subnet_ids      = module.aws_vpc.private_subnets
     }
   }
+}
 
-  metrics_server_enable     = true
-  cluster_autoscaler_enable = true
+module "kubernetes-addons" {
+  source         = "github.com/aws-samples/aws-eks-accelerator-for-terraform//modules/kubernetes-addons"
+  eks_cluster_id = module.aws-eks-accelerator-for-terraform.eks_cluster_id
+
+  #K8s Add-ons
+  enable_metrics_server     = true
+  enable_cluster_autoscaler = true
+
   #---------------------------------------
   # COMMUNITY PROMETHEUS ENABLE
   #---------------------------------------
-  prometheus_enable = true
+  enable_prometheus = true
 
   # Optional Map value
-  prometheus_helm_chart = {
+  prometheus_helm_config = {
     name       = "prometheus"                                         # (Required) Release name.
     repository = "https://prometheus-community.github.io/helm-charts" # (Optional) Repository URL where to locate the requested chart.
     chart      = "prometheus"                                         # (Required) Chart name to be installed.
     version    = "14.4.0"                                             # (Optional) Specify the exact chart version to install. If this is not specified, the latest version is installed.
     namespace  = "prometheus"                                         # (Optional) The namespace to install the release into. Defaults to default
-    values = [templatefile("${path.module}/k8s_addons/prometheus-values.yaml", {
+    values = [templatefile("${path.module}/helm_values/prometheus-values.yaml", {
       operating_system = "linux"
     })]
 
@@ -143,10 +150,10 @@ module "aws-eks-accelerator-for-terraform" {
   #---------------------------------------
   # ENABLE SPARK on K8S OPERATOR
   #---------------------------------------
-  spark_on_k8s_operator_enable = true
+  enable_spark_k8s_operator = true
 
   # Optional Map value
-  spark_on_k8s_operator_helm_chart = {
+  spark_k8s_operator_helm_config = {
     name             = "spark-operator"
     chart            = "spark-operator"
     repository       = "https://googlecloudplatform.github.io/spark-on-k8s-operator"
@@ -154,8 +161,9 @@ module "aws-eks-accelerator-for-terraform" {
     namespace        = "spark-k8s-operator"
     timeout          = "1200"
     create_namespace = true
-    values           = [templatefile("${path.module}/k8s_addons/spark-k8s-operator-values.yaml", {})]
+    values           = [templatefile("${path.module}/helm_values/spark-k8s-operator-values.yaml", {})]
 
   }
+
 
 }

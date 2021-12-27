@@ -89,9 +89,4 @@ module "aws-eks-accelerator-for-terraform" {
       max_size        = "10"
     }
   }
-
-  metrics_server_enable = true
-
-  cluster_autoscaler_enable = true
-
 }

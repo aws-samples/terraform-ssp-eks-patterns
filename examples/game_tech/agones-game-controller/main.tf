@@ -155,15 +155,25 @@ module "aws-eks-accelerator-for-terraform" {
     },
   }
 
-  metrics_server_enable     = true
-  cluster_autoscaler_enable = true
+
+}
+
+module "kubernetes-addons" {
+  source                       = "github.com/aws-samples/aws-eks-accelerator-for-terraform//modules/kubernetes-addons"
+  eks_cluster_id               = module.aws-eks-accelerator-for-terraform.eks_cluster_id
+  eks_worker_security_group_id = module.aws-eks-accelerator-for-terraform.worker_security_group_id
+
+  #K8s Add-ons
+  enable_metrics_server     = true
+  enable_cluster_autoscaler = true
+
   #---------------------------------------
   # ENABLE AGONES
   #---------------------------------------
   # NOTE: Agones requires a Node group in Public Subnets and enable Public IP
-  agones_enable = false
+  enable_agones = true
   # Optional  agones_helm_chart
-  agones_helm_chart = {
+  agones_helm_config = {
     name               = "agones"
     chart              = "agones"
     repository         = "https://agones.dev/chart/stable"
@@ -171,12 +181,11 @@ module "aws-eks-accelerator-for-terraform" {
     namespace          = "kube-system"
     gameserver_minport = 7000 # required for sec group changes to worker nodes
     gameserver_maxport = 8000 # required for sec group changes to worker nodes
-    values = [templatefile("${path.module}/k8s_addons/agones-values.yaml", {
+    values = [templatefile("${path.module}/helm_values/agones-values.yaml", {
       expose_udp            = true
       gameserver_namespaces = "{${join(",", ["default", "xbox-gameservers", "xbox-gameservers"])}}"
       gameserver_minport    = 7000
       gameserver_maxport    = 8000
     })]
   }
-
 }

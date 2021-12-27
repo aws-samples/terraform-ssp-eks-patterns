@@ -57,9 +57,10 @@ locals {
 
   kubernetes_version = "1.21"
 
-  vpc_cidr     = "10.0.0.0/16"
-  vpc_name     = join("-", [local.tenant, local.environment, local.zone, "vpc"])
-  cluster_name = join("-", [local.tenant, local.environment, local.zone, "eks"])
+  vpc_cidr                          = "10.0.0.0/16"
+  vpc_name                          = join("-", [local.tenant, local.environment, local.zone, "vpc"])
+  cluster_name                      = join("-", [local.tenant, local.environment, local.zone, "eks"])
+  amazon_prometheus_workspace_alias = join("-", ["amp-workspace", local.tenant, local.environment, local.zone, "eks"])
 
   terraform_version = "Terraform v1.0.1"
 }
@@ -95,7 +96,8 @@ module "aws_vpc" {
 # Example to consume aws-eks-accelerator-for-terraform module
 #---------------------------------------------------------------
 module "aws-eks-accelerator-for-terraform" {
-  source     = "github.com/aws-samples/aws-eks-accelerator-for-terraform"
+  source = "github.com/aws-samples/aws-eks-accelerator-for-terraform"
+
   create_eks = true
 
   tenant            = local.tenant
@@ -120,32 +122,8 @@ module "aws-eks-accelerator-for-terraform" {
     }
   }
 
-  metrics_server_enable     = true
-  cluster_autoscaler_enable = true
-
-  #---------------------------------------
-  # AWS MANAGED PROMETHEUS ENABLE
-  #---------------------------------------
-  aws_managed_prometheus_enable         = true
-  aws_managed_prometheus_workspace_name = "amp-workspace-${local.cluster_name}"
-
-  #---------------------------------------
-  # COMMUNITY PROMETHEUS ENABLE
-  #---------------------------------------
-  prometheus_enable = true
-
-  # Optional Map value
-  prometheus_helm_chart = {
-    name       = "prometheus"                                         # (Required) Release name.
-    repository = "https://prometheus-community.github.io/helm-charts" # (Optional) Repository URL where to locate the requested chart.
-    chart      = "prometheus"                                         # (Required) Chart name to be installed.
-    version    = "14.4.0"                                             # (Optional) Specify the exact chart version to install. If this is not specified, the latest version is installed.
-    namespace  = "prometheus"                                         # (Optional) The namespace to install the release into. Defaults to default
-    values = [templatefile("${path.module}/k8s_addons/prometheus-values.yaml", {
-      operating_system = "linux"
-    })]
-
-  }
+  # Enable Amazon Managed Prometheus
+  enable_amazon_prometheus = true
 
   #---------------------------------------
   # ENABLE EMR ON EKS
@@ -170,32 +148,49 @@ module "aws-eks-accelerator-for-terraform" {
 
   }
 
+}
+
+module "addons" {
+  source = "github.com/aws-samples/aws-eks-accelerator-for-terraform//modules/kubernetes-addons"
+
+  eks_cluster_id = module.aws-eks-accelerator-for-terraform.eks_cluster_id
+
+  #K8s Add-ons
+  enable_metrics_server     = true
+  enable_cluster_autoscaler = true
+
+  #---------------------------------------
+  # PROMETHEUS CONFIG
+  #---------------------------------------
+  amazon_prometheus_workspace_id           = module.aws-eks-accelerator-for-terraform.amazon_prometheus_workspace_id
+  amazon_prometheus_ingest_iam_role_arn    = module.aws-eks-accelerator-for-terraform.amazon_prometheus_ingest_iam_role_arn
+  amazon_prometheus_ingest_service_account = module.aws-eks-accelerator-for-terraform.amazon_prometheus_ingest_service_account
+
+  enable_prometheus = true
+  # Optional Map value
+  prometheus_helm_config = {
+    name       = "prometheus"                                         # (Required) Release name.
+    repository = "https://prometheus-community.github.io/helm-charts" # (Optional) Repository URL where to locate the requested chart.
+    chart      = "prometheus"                                         # (Required) Chart name to be installed.
+    version    = "14.4.0"                                             # (Optional) Specify the exact chart version to install. If this is not specified, the latest version is installed.
+    namespace  = "prometheus"                                         # (Optional) The namespace to install the release into. Defaults to default
+    values = [templatefile("${path.module}/helm_values/prometheus-values.yaml", {
+      operating_system = "linux"
+    })]
+
+  }
   #---------------------------------------
   # Vertical Pod Autoscaling
   #---------------------------------------
-  vpa_enable = true
+  enable_vpa = true
 
-  vpa_helm_chart = {
+  vpa_helm_config = {
     name       = "vpa"                                 # (Required) Release name.
     repository = "https://charts.fairwinds.com/stable" # (Optional) Repository URL where to locate the requested chart.
     chart      = "vpa"                                 # (Required) Chart name to be installed.
     version    = "0.5.0"                               # (Optional) Specify the exact chart version to install. If this is not specified, the latest version is installed.
     namespace  = "vpa-ns"                              # (Optional) The namespace to install the release into. Defaults to default
-    values     = [templatefile("${path.module}/k8s_addons/vpa-values.yaml", {})]
+    values     = [templatefile("${path.module}/helm_values/vpa-values.yaml", {})]
   }
-
-  #---------------------------------------
-  # Apache YuniKorn K8s Spark Scheduler
-  #---------------------------------------
-  yunikorn_enable = false
-
-  yunikorn_helm_chart = {
-    name       = "yunikorn"                                            # (Required) Release name.
-    repository = "https://apache.github.io/incubator-yunikorn-release" # (Optional) Repository URL where to locate the requested chart.
-    chart      = "yunikorn"                                            # (Required) Chart name to be installed.
-    version    = "0.11.0"                                              # (Optional) Specify the exact chart version to install. If this is not specified, the latest version is installed.
-    values     = [templatefile("${path.module}/k8s_addons/yunikorn-values.yaml", {})]
-  }
-
 
 }

@@ -73,7 +73,7 @@ Use the following link to install Cloud9 IDE and all the pre-requisites Kubernet
 
     git clone <thisrepo>
 
-    cd examples/advanced/agones-game-controller/
+    cd examples/game_tech/agones-game-controller/
 
 ## Step6: Run Terraform init on the Gaming EKS Cluster Configuration
 To initialize a working directory with configuration files.

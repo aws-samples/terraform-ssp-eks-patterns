@@ -1,6 +1,9 @@
 #!/bin/bash
-#  You can use pod template files to define the driver or executor pod’s configurations that Spark configurations do not support.
-# see Pod Template (https://spark.apache.org/docs/3.0.0-preview/running-on-kubernetes.html#pod-template).
+
+# NOTE
+# This job requires additional policies for EMR Role
+      # 1. S3 Object Delete
+      # 2. Glue catalog create, read,write and update policies
 
 # INPUT VARIABLES
 EMR_ON_EKS_ROLE_ID="aws001-preprod-test-emr-eks-data-team-a"       # Replace EMR IAM role with your ID
@@ -14,7 +17,7 @@ CW_LOG_GROUP="/emr-on-eks-logs/${EMR_VIRTUAL_CLUSTER_NAME}/${EMR_ON_EKS_NAMESPAC
 SPARK_JOB_S3_PATH="${S3_BUCKET}/${EMR_VIRTUAL_CLUSTER_NAME}/${EMR_ON_EKS_NAMESPACE}/${JOB_NAME}"
 
 # Step1: COPY POD TEMPLATES TO S3 Bucket
-aws s3 sync ./pyspark/ "${SPARK_JOB_S3_PATH}/"
+aws s3 sync ./spark-scripts/ "${SPARK_JOB_S3_PATH}/"
 
 # FIND ROLE ARN and EMR VIRTUAL CLUSTER ID
 EMR_ROLE_ARN=$(aws iam get-role --role-name $EMR_ON_EKS_ROLE_ID --query Role.Arn --output text)
@@ -34,7 +37,7 @@ if [[ $VIRTUAL_CLUSTER_ID != "" ]]; then
         "entryPointArguments": ["'"$SPARK_JOB_S3_PATH"'/input/taxi-trip-data/",
           "'"$SPARK_JOB_S3_PATH"'/output/taxi-trip-data/", "taxidata"
         ],
-        "sparkSubmitParameters": "--conf spark.executor.instances=2 --conf spark.executor.memory=20G --conf spark.executor.cores=6 --conf spark.driver.cores=4"
+        "sparkSubmitParameters": "--conf spark.executor.instances=2 --conf spark.executor.memory=2G --conf spark.executor.cores=2 --conf spark.driver.cores=1"
       }
    }' \
     --configuration-overrides '{
@@ -43,15 +46,8 @@ if [[ $VIRTUAL_CLUSTER_ID != "" ]]; then
             "classification": "spark-defaults",
             "properties": {
               "spark.hadoop.hive.metastore.client.factory.class":"com.amazonaws.glue.catalog.metastore.AWSGlueDataCatalogHiveClientFactory",
-              "spark.driver.memory":"10G",
-              "spark.kubernetes.driver.podTemplateFile":"'"$SPARK_JOB_S3_PATH"'/scripts/spark-driver-pod-template.yaml",
-              "spark.kubernetes.executor.podTemplateFile":"'"$SPARK_JOB_S3_PATH"'/scripts/spark-executor-pod-template.yaml",
-              "spark.kubernetes.executor.podNamePrefix":"taxidata",
-              "spark.dynamicAllocation.enabled":"true",
-              "spark.dynamicAllocation.shuffleTracking.enabled":"true",
-              "spark.dynamicAllocation.minExecutors":"5",
-              "spark.dynamicAllocation.maxExecutors":"100",
-              "spark.dynamicAllocation.initialExecutors":"10"
+              "spark.driver.memory":"2G",
+              "spark.kubernetes.executor.podNamePrefix":"taxidata"
             }
           }
         ],
